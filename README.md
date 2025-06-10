@@ -9,6 +9,7 @@ Flow State is a beautiful, minimal TUI (Terminal User Interface) habit tracker s
 ## 🧠 Why ADHD-Focused?
 
 Traditional habit trackers often fail for ADHD users because they:
+
 - Break "streaks" after one missed day (devastating for rejection-sensitive brains)
 - Overwhelm with too many options and data points
 - Require consistent daily engagement (difficult with executive dysfunction)
@@ -19,6 +20,7 @@ Flow State addresses these pain points with thoughtful design choices.
 ## 📋 Current Features (Design Phase)
 
 ### ✨ Core Functionality
+
 - **Dual Habit Types**: Track positive habits to build AND negative habits to avoid
 - **Forgiving Progress System**: Pattern-based tracking instead of fragile streaks
 - **Minimal Cognitive Load**: Clean, focused interface showing only what matters today
@@ -26,6 +28,7 @@ Flow State addresses these pain points with thoughtful design choices.
 - **Smart Limits**: 5-10 good habits, 2-5 bad habits (prevents overwhelm)
 
 ### 🎨 ADHD-Friendly Design Elements
+
 - **Visual Dopamine Hits**: Bright colors and clear checkmarks for completion
 - **Encouraging Language**: "Building momentum" instead of "streak broken"
 - **Flexible Progress Tracking**: Allows for real life interruptions
@@ -36,16 +39,17 @@ Flow State addresses these pain points with thoughtful design choices.
 
 Instead of traditional streaks that reset to zero, Flow State uses a **pattern-based approach**:
 
-| Status | Emoji | Weekly Habits | Bi-weekly Habits |
-|--------|-------|---------------|------------------|
-| 🔥 **Strong** | Fire | 6-7 out of last 7 days | 12-14 out of last 14 days |
-| 🎯 **Consistent** | Target | 4-5 out of last 7 days | 8-11 out of last 14 days |
-| 🌱 **Growing** | Seedling | 2-3 out of last 7 days | 4-7 out of last 14 days |
-| 📈 **Building** | Chart | 1 out of last 7 days | 1-3 out of last 14 days |
-| 🔄 **Restarting** | Refresh | Ready to begin again | Fresh start available |
-| 🌙 **Resting** | Moon | Recovery period | Taking a break |
+| Status            | Emoji    | Weekly Habits          | Bi-weekly Habits          |
+| ----------------- | -------- | ---------------------- | ------------------------- |
+| 🔥 **Strong**     | Fire     | 6-7 out of last 7 days | 12-14 out of last 14 days |
+| 🎯 **Consistent** | Target   | 4-5 out of last 7 days | 8-11 out of last 14 days  |
+| 🌱 **Growing**    | Seedling | 2-3 out of last 7 days | 4-7 out of last 14 days   |
+| 📈 **Building**   | Chart    | 1 out of last 7 days   | 1-3 out of last 14 days   |
+| 🔄 **Restarting** | Refresh  | Ready to begin again   | Fresh start available     |
+| 🌙 **Resting**    | Moon     | Recovery period        | Taking a break            |
 
 This system:
+
 - ✅ Uses consistent 7-day (calendar-aligned)
 - ✅ Celebrates consistency over perfection
 - ✅ Allows missed days without penalty
@@ -55,6 +59,7 @@ This system:
 ## 🎮 User Interface Design
 
 ### Main Screen Layout
+
 ```
 ┌─────────────────────────────────────────┐
 │              🌊 Flow State 🌊           │
@@ -86,28 +91,33 @@ This system:
 ```
 
 ### Vim Keybindings
-| Key | Action |
-|-----|--------|
-| `hjkl` | Navigate up/down/left/right |
-| `gg` / `G` | Jump to top/bottom |
-| `1-9` | Toggle specific habit |
-| `SPACE` | Toggle selected habit |
-| `TAB` | Switch between views |
-| `a` | Add new habit |
-| `d` | Delete habit |
-| `q` | Quit application |
+
+| Key        | Action                      |
+| ---------- | --------------------------- |
+| `hjkl`     | Navigate up/down/left/right |
+| `gg` / `G` | Jump to top/bottom          |
+| `1-9`      | Toggle specific habit       |
+| `SPACE`    | Toggle selected habit       |
+| `TAB`      | Switch between views        |
+| `a`        | Add new habit               |
+| `d`        | Delete habit                |
+| `q`        | Quit application            |
 
 ## 📈 Development Journey
 
 ### Phase 1: Ideation ✅
+
 **Goal**: Define the problem and vision
+
 - ✅ Identified ADHD-specific pain points with existing habit trackers
 - ✅ Designed forgiving progress system
 - ✅ Created UI mockup with ADHD-friendly elements
 - ✅ Established habit limits (5-10 good, 2-5 bad)
 
 ### Phase 2: Technical Design 🔄
+
 **Goal**: Plan the Rust implementation
+
 - [ ] Choose TUI library (ratatui vs cursive vs tui-rs)
 - [ ] Design data structures for habits and progress
 - [ ] Plan file-based persistence strategy
@@ -115,7 +125,9 @@ This system:
 - [ ] Design state management for different views
 
 ### Phase 3: Core Implementation 📋
+
 **Goal**: Build MVP functionality
+
 - [ ] Basic TUI with tab navigation
 - [ ] Habit creation and management
 - [ ] Daily check-in system
@@ -123,25 +135,20 @@ This system:
 - [ ] Data persistence (JSON/TOML files)
 
 ### Phase 4: Polish & Features 📋
+
 **Goal**: Enhance user experience
+
 - [ ] Color themes and visual polish
 - [ ] Week/month view implementations
 - [ ] Statistics and insights
 - [ ] Import/export functionality
 - [ ] Optional system notifications
 
-### Phase 5: Advanced Features 📋
-**Goal**: Power user enhancements
-- [ ] Habit templates and categories
-- [ ]Custom progress formulas
-- [ ] Plugin system for extensions
-- [ ] Cloud sync capabilities
-
 ## 🛠️ Technical Stack
 
 - **Language**: Rust 🦀
-- **TUI Framework**: TBD (likely ratatui)
-- **Data Storage**: Local files (JSON/TOML)
+- **TUI Framework**: ratatui
+- **Data Storage**: Local files TOML
 - **Configuration**: TOML config files
 - **Platform**: Cross-platform (Windows, macOS, Linux)
 
@@ -172,4 +179,5 @@ Built with love for the ADHD and neurodivergent community. Special thanks to eve
 
 ---
 
-*"Progress, not perfection. Patterns, not streaks. Kindness, not judgment."*
+_"Progress, not perfection. Patterns, not streaks. Kindness, not judgment."_
+
