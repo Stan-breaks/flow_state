@@ -36,18 +36,21 @@ Flow State addresses these pain points with thoughtful design choices.
 
 Instead of traditional streaks that reset to zero, Flow State uses a **pattern-based approach**:
 
-| Status | Emoji | Meaning | Calculation |
-|--------|-------|---------|-------------|
-| 🔥 **Active/Strong** | Fire | Excellent consistency | 8-10 out of last 10 days |
-| 🎯 **Consistent** | Target | Reliable weekly pattern | 5-7 out of last 7 days |
-| 🌱 **Growing** | Seedling | Building momentum | 4-6 out of last 10 days |
-| 📈 **Building** | Chart | Starting progress | 2-4 out of last 7 days |
+| Status | Emoji | Weekly Habits | Bi-weekly Habits |
+|--------|-------|---------------|------------------|
+| 🔥 **Strong** | Fire | 6-7 out of last 7 days | 12-14 out of last 14 days |
+| 🎯 **Consistent** | Target | 4-5 out of last 7 days | 8-11 out of last 14 days |
+| 🌱 **Growing** | Seedling | 2-3 out of last 7 days | 4-7 out of last 14 days |
+| 📈 **Building** | Chart | 1 out of last 7 days | 1-3 out of last 14 days |
+| 🔄 **Restarting** | Refresh | Ready to begin again | Fresh start available |
+| 🌙 **Resting** | Moon | Recovery period | Taking a break |
 
 This system:
+- ✅ Uses consistent 7-day (calendar-aligned)
 - ✅ Celebrates consistency over perfection
-- ✅ Allows 1-2 missed days without penalty
+- ✅ Allows missed days without penalty
 - ✅ Uses positive, growth-oriented language
-- ✅ Focuses on recent performance vs. all-time stats
+- ✅ Adapts messaging when patterns struggle
 
 ## 🎮 User Interface Design
 
@@ -57,24 +60,32 @@ This system:
 │              🌊 Flow State 🌊           │
 │           Tuesday, June 10, 2025        │
 ├─────────────────────────────────────────┤
-│ [Today] [Week] [Manage] [Stats]         │
+│ [Today]       [Manage]        [stats]   │
 ├─────────────────────────────────────────┤
 │ 🌟 Good Habits (5/10)                   │
 │ ✅ [1] Take morning medication          │
+│      🔥 Strong • 6/7 this week          │
 │ ⚪ [2] Drink 8 glasses of water         │
+│      🌱 Growing • 3/7 this week         │
 │ ✅ [3] 15 min exercise/walk             │
+│      🎯 Consistent • 4/7 this week      │
+│ ⚪ [4] Deep clean one area              │
+│      🌱 Growing • 3/7     weekly        │
+│ ⚪ [5] Call family/friends              │
+│      🔄 Restarting • 1/7  weekly        │
 │                                         │
 │ 🚫 Habits to Avoid (2/5)                │
 │ ✅ [6] No social media before noon      │
+│      🎯 Consistent • 5/7 this week      │
 │ ⚪ [7] No phone during meals            │
+│      🌙 Resting • 0/7 this week         │
 ├─────────────────────────────────────────┤
-│ Progress: ████████████████░░░░ 43%      │
+│ Progress: ████████████░░░░░░░░ 43%      │
 │ Navigation: hjkl • Toggle: 1-9 • q quit │
 └─────────────────────────────────────────┘
 ```
 
 ### Vim Keybindings
-
 | Key | Action |
 |-----|--------|
 | `hjkl` | Navigate up/down/left/right |
