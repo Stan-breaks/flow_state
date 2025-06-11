@@ -53,7 +53,7 @@ impl App {
     fn increment_counter(&mut self) -> Result<()> {
         self.counter += 1;
         if self.counter > 2 {
-            bail!("buffer overflow")
+            bail!("counter overflow")
         }
         Ok(())
     }
@@ -139,5 +139,24 @@ mod tests {
         assert!(app.exit);
 
         Ok(())
+    }
+    #[test]
+    #[should_panic(expected = "attempt to subtract with overflow")]
+    fn handle_key_event_panic() {
+        let mut app = App::default();
+        let _ = app.handle_key_event(KeyCode::Left.into());
+    }
+
+    #[test]
+    fn handle_key_event_overflow() {
+        let mut app = App::default();
+        assert!(app.handle_key_event(KeyCode::Right.into()).is_ok());
+        assert!(app.handle_key_event(KeyCode::Right.into()).is_ok());
+        assert_eq!(
+            app.handle_key_event(KeyCode::Right.into())
+                .unwrap_err()
+                .to_string(),
+            "counter overflow"
+        );
     }
 }
