@@ -71,39 +71,44 @@ pub fn ui(frame: &mut Frame, app: &App) {
 
     match app.current_screen {
         CurrentScreen::Today => {
-            let footer_chucks = Layout::default()
-                .direction(Direction::Vertical)
-                .constraints([
-                    Constraint::Percentage(25),
-                    Constraint::Percentage(25),
-                    Constraint::Percentage(25),
-                ])
-                .split(body_chunks[1]);
-            let today_stats = Line::from("Today: ████████░░░░ 67% (4/6 active)")
-                .fg(Color::Green)
-                .centered();
-            frame.render_widget(today_stats, footer_chucks[0]);
-            let weekly_stats = Line::from("Week:  ███████░░░░░ 58% trending up ↗")
-                .fg(Color::Green)
-                .centered();
-            frame.render_widget(weekly_stats, footer_chucks[1]);
-            let hints = Line::from("Toggle: 1-7 • Menu: hjkl • Views: TAB")
-                .fg(Color::Green)
-                .centered();
-            frame.render_widget(hints, footer_chucks[2]);
+            let footer_items = vec![
+                ListItem::new(
+                    Line::from("Today: ████████░░░░ 67% (4/6 active)")
+                        .fg(Color::Green)
+                        .centered(),
+                ),
+                ListItem::new(
+                    Line::from("Week:  ███████░░░░░ 58% trending up ↗")
+                        .fg(Color::Green)
+                        .centered(),
+                ),
+                ListItem::new(
+                    Line::from("Toggle: 1-7 • Menu: hjkl • Views: TAB")
+                        .fg(Color::Green)
+                        .centered(),
+                ),
+            ];
+            let footer = List::new(footer_items).block(Block::default().borders(Borders::ALL));
+            frame.render_widget(footer, body_chunks[1]);
         }
         CurrentScreen::Manage => {
-            let hints = Line::from(
-                "[a] Add • [e] Edit • [d] Delete • [p] Pause/Resume • [↑↓]/[hjkl] Navigate",
+            let hints = Paragraph::new(
+                Line::from(
+                    "[a] Add • [e] Edit • [d] Delete • [p] Pause/Resume • [↑↓]/[hjkl] Navigate",
+                )
+                .centered()
+                .fg(Color::Green),
             )
-            .centered()
-            .fg(Color::Green);
+            .block(Block::default().borders(Borders::ALL));
             frame.render_widget(hints, body_chunks[1]);
         }
         CurrentScreen::Stats => {
-            let hints = Line::from("[P] Bulk pause • [↑↓]/[hjkl] Navigate")
-                .fg(Color::Green)
-                .centered();
+            let hints = Paragraph::new(
+                Line::from("[P] Bulk pause • [↑↓]/[hjkl] Navigate")
+                    .fg(Color::Green)
+                    .centered(),
+            )
+            .block(Block::default().borders(Borders::ALL));
             frame.render_widget(hints, body_chunks[1]);
         }
     }
