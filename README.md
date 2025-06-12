@@ -1,128 +1,121 @@
-# 🌊 Flow State
+# Flow State
 
-> A terminal habit tracker that celebrates progress over perfection. Designed for ADHD brains that need encouragement, not judgment.
+A terminal-based habit tracker designed for neurodivergent users. Focuses on progress patterns rather than perfect streaks.
 
-## 🧠 Why Flow State?
+## Features
 
-Traditional habit trackers break ADHD brains by:
-- Resetting "streaks" after one missed day
-- Overwhelming with too many options
-- Focusing on perfection instead of progress
-- Requiring daily consistency (impossible with executive dysfunction)
+- **Pattern-based tracking**: Weekly progress patterns instead of breakable streaks
+- **Neurodivergent-friendly**: Built with ADHD considerations in mind
+- **Dual habit types**: Track habits to build and habits to avoid
+- **Flexible scheduling**: Daily, weekly, and custom frequencies
+- **Pause system**: Life-aware habit management for difficult periods
+- **Minimal interface**: Keyboard-driven with essential information only
+- **Local storage**: All data stored locally using TOML files
 
-Flow State works **with** your brain, not against it.
+## Design Philosophy
 
-## ✨ Core Features
+Traditional habit trackers often fail neurodivergent users by:
+- Resetting progress after missing a single day
+- Overwhelming with excessive options and tracking
+- Focusing on perfection rather than sustainable progress
+- Requiring daily consistency that doesn't account for executive dysfunction
 
-- **Pattern-Based Progress**: No streaks to break, just patterns to build
-- **Dual Habit Types**: Build good habits, avoid bad ones
-- **Minimal Interface**: See only what matters today
-- **Vim Keybindings**: Efficient, keyboard-driven navigation
-- **Smart Limits**: Maximum 7 habits total (prevents overwhelm)
+Flow State addresses these issues by emphasizing patterns over perfection and providing encouragement rather than judgment.
 
-## 🔄 Progress System
+## Progress System
 
-Instead of fragile streaks, Flow State tracks your **weekly patterns**:
+Instead of streaks, Flow State tracks weekly patterns using a rolling 7-day window:
 
-| Status | Days This Week | Message |
-|--------|----------------|---------|
-| 🔥 **Strong** | 5-7 days | You're crushing it! |
-| 🎯 **Consistent** | 3-4 days | Great momentum! |
-| 🌱 **Growing** | 1-2 days | Building the habit! |
-| 🔄 **Fresh Start** | 0 days | Ready to begin! |
+- **Mastering** (85-100%): Strong, consistent pattern
+- **Building** (60-84%): Good momentum established  
+- **Growing** (25-59%): Pattern forming
+- **Starting** (0-24%): Beginning phase
 
-## 🎮 Interface Design
+## Installation
 
-```
-┌─────────────────────────────────────────┐
-│              🌊 Flow State 🌊           │
-│           Tuesday, June 10, 2025        │
-├─────────────────────────────────────────┤
-│ [Today]       [Manage]        [Stats]   │
-├─────────────────────────────────────────┤
-│ 🌟 Build These Habits                   │
-│ ✅ [1] Take morning medication          │
-│      🔥 Strong • 6/7 this week          │
-│ ⚪ [2] Drink 8 glasses of water         │
-│      🌱 Growing • 2/7 this week         │
-│ ✅ [3] 15 min exercise/walk             │
-│      🎯 Consistent • 4/7 this week      │
-│                                         │
-│ 🚫 Avoid These Habits                   │
-│ ✅ [4] No social media before noon      │
-│      🎯 Consistent • 4/7 this week      │
-│ ⚪ [5] No phone during meals            │
-│      🔄 Fresh Start • 0/7 this week     │
-├─────────────────────────────────────────┤
-│ Today's Progress: ████████░░░░ 60%      │
-│ Toggle: 1-5 • Navigate: hjkl • Quit: q  │
-└─────────────────────────────────────────┘
+```bash
+cargo install flow-state
 ```
 
-## ⌨️ Controls
+Or build from source:
 
-| Key | Action |
-|-----|--------|
-| `1-7` | Toggle specific habit |
-| `hjkl` | Navigate (Vim style) |
-| `TAB` | Switch between views |
-| `a` | Add habit |
-| `d` | Delete habit |
-| `q` | Quit |
+```bash
+git clone https://github.com/Stan-breaks/flow_state
+cd flow-state
+cargo build --release
+```
 
-## 🗂️ Views
+## Usage
 
-1. **Today**: Daily check-in and progress
-2. **Manage**: Add/edit/delete habits
-3. **Stats**: Weekly and monthly patterns
+### Basic Commands
 
-## 🛠️ Technical Stack
+- `flow-state` - Start the application
+- `q` - Quit
+- `TAB` - Switch between views (Today/Manage/Stats)
+- `1-7` - Toggle habits in Today view
+- `hjkl` - Navigate (Vim-style)
+
+### Views
+
+**Today View**: Daily habit check-in and progress overview
+**Manage View**: Add, edit, delete, and pause habits  
+**Stats View**: Weekly and monthly progress patterns
+
+### Habit Management
+
+- Maximum 7 active habits to prevent overwhelm
+- Context fields for time, location, and prerequisites
+- Pause system for life disruptions
+- Flexible frequency options (daily/weekly/custom)
+
+## Data Storage
+
+All data is stored locally in `~/.config/flow-state/`:
+
+```
+~/.config/flow-state/
+├── config.toml       # Application settings
+├── habits.toml       # Habit definitions
+├── data/             # Monthly progress data
+└── backups/          # Automatic backups
+```
+
+## Technical Details
 
 - **Language**: Rust
-- **TUI**: ratatui
-- **Storage**: Local TOML files
-- **Platform**: Cross-platform terminal app
+- **TUI Library**: ratatui
+- **Storage Format**: TOML
+- **Platform Support**: Linux, macOS, Windows
+- **Dependencies**: Minimal, focused on core functionality
 
-## 📈 Development Phases
+## Development
 
-### Phase 1: Foundation ✅
-- [x] Project vision and design
-- [x] ADHD-focused UX research
-- [x] Progress system design
+### Requirements
 
-### Phase 2: Core Implementation 🔄
-- [ ] Basic TUI with navigation
-- [ ] Habit management (add/edit/delete)
-- [ ] Daily check-in system
-- [ ] Pattern-based progress tracking
-- [ ] TOML file persistence
+- Rust 1.70+
+- Cargo
 
-### Phase 3: Polish 📋
-- [ ] Visual themes and colors
-- [ ] Statistics view
-- [ ] Configuration options
-- [ ] Cross-platform testing
+### Building
 
-## 🎯 Design Principles
+```bash
+cargo build
+cargo test
+cargo run
+```
 
-1. **Neurodivergent-First**: Every choice considers ADHD needs
-2. **Progress Over Perfection**: Any forward movement counts
-3. **Minimal Cognitive Load**: Show only what's essential
-4. **Keyboard Efficiency**: No mouse required
-5. **Encouraging Feedback**: Celebrate every win
+### Contributing
 
-## 🤝 Contributing
+Contributions welcome, especially from neurodivergent developers who understand the target use case. Please focus on:
 
-Flow State is built by and for the neurodivergent community. Contributions welcome:
+- Accessibility improvements
+- ADHD-friendly UX enhancements
+- Performance optimizations
+- Cross-platform compatibility
 
-- 💡 Feature ideas and ADHD-friendly improvements
-- 🐛 Testing across different ADHD experiences
-- 📝 Documentation and accessibility improvements
+## License
 
-## 📝 License
+MIT License
 
-MIT License (encouraging open source adoption)
+## Acknowledgments
 
----
-
-_"Progress, not perfection. Patterns, not streaks. Kindness, not judgment."_
+Built with input from the neurodivergent community to create tools that work with different brain types rather than against them.
