@@ -74,13 +74,13 @@ pub fn ui(frame: &mut Frame, app: &App) {
     let key_notes_footer =
         Paragraph::new(Line::from(current_keys_hint)).block(Block::default().borders(Borders::ALL));
 
-    let footer_chunks = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+    let body_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Min(1), Constraint::Length(3)])
         .split(chunks[2]);
 
-    frame.render_widget(mode_footer, footer_chunks[0]);
-    frame.render_widget(key_notes_footer, footer_chunks[1]);
+    frame.render_widget(mode_footer, chunks[1]);
+    frame.render_widget(key_notes_footer, body_chunks[1]);
 }
 
 /// helper function to create a centered rect using up certain percentage of the available rect `r`
