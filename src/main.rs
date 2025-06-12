@@ -49,6 +49,10 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
             if key.kind == event::KeyEventKind::Release {
                 continue;
             }
+            match key.code {
+                KeyCode::Char('q') => break,
+                _ => {}
+            };
             match app.current_screen {
                 CurrentScreen::Today => match key.code {
                     KeyCode::Tab => {
@@ -72,4 +76,5 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
             }
         }
     }
+    Ok(())
 }
