@@ -1,4 +1,4 @@
-use std::{error::Error, io};
+use std::io;
 
 use ratatui::{
     backend::{Backend, CrosstermBackend},
@@ -17,7 +17,7 @@ use crate::{
     ui::ui,
 };
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> color_eyre::Result<()> {
     // setup terminal
     enable_raw_mode()?;
     let mut stderr = io::stderr(); // This is a special case. Normally using stdout is fine
@@ -49,7 +49,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<bool> {
+fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre::Result<bool> {
     loop {
         terminal.draw(|f| ui(f, app))?;
 
