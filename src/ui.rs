@@ -1,8 +1,9 @@
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
-    style::{Color, Style},
+    style::{Color, Style, Stylize},
+    symbols::border,
     text::{Line, Span, Text},
-    widgets::{Block, Borders, Paragraph},
+    widgets::{Block, Borders, List, ListItem, Paragraph},
     Frame,
 };
 
@@ -13,21 +14,21 @@ pub fn ui(frame: &mut Frame, app: &App) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
+            Constraint::Length(4),
             Constraint::Length(3),
             Constraint::Min(1),
-            Constraint::Length(3),
         ])
         .split(frame.area());
 
-    let title_block = Block::default()
-        .borders(Borders::ALL)
-        .style(Style::default());
-
-    let title = Paragraph::new(Text::styled(
-        " 🌊 Flow State 🌊 ",
-        Style::default().fg(Color::Green),
-    ))
-    .block(title_block);
+    let title_items = vec![
+        ListItem::new(
+            Line::from("🌊 Flow State 🌊")
+                .style(Style::default().bold())
+                .centered(),
+        ),
+        ListItem::new(Line::from("Progress Stats").centered()),
+    ];
+    let title = List::new(title_items).block(Block::default().borders(Borders::ALL));
 
     frame.render_widget(title, chunks[0]);
 
