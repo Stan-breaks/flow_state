@@ -32,27 +32,34 @@ pub fn ui(frame: &mut Frame, app: &App) {
 
     frame.render_widget(title, chunks[0]);
 
-    let current_navigation_text = vec![
-        // The first half of the text
-        match app.current_screen {
-            CurrentScreen::Today => Span::styled(
-                "Today",
-                Style::default().bg(Color::LightYellow).fg(Color::Green),
-            ),
-            CurrentScreen::Manage => Span::styled(
-                "Manage",
-                Style::default().bg(Color::LightYellow).fg(Color::Green),
-            ),
-            CurrentScreen::Stats => Span::styled(
-                "Stats",
-                Style::default().bg(Color::LightYellow).fg(Color::Green),
-            ),
-        }
-        .to_owned(),
-    ];
+    let tab_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Min(1), Constraint::Min(1), Constraint::Min(1)])
+        .split(chunks[1]);
 
-    let mode_footer = Paragraph::new(Line::from(current_navigation_text))
-        .block(Block::default().borders(Borders::ALL));
+    let today_tab = match app.current_screen {
+        CurrentScreen::Today => {
+            Paragraph::new(Line::from("Today").fg(Color::Black).bg(Color::LightYellow)).centered()
+        }
+        _ => Paragraph::new(Line::from("Today")).centered(),
+    };
+    frame.render_widget(today_tab, tab_chunks[0]);
+
+    let manage_tab = match app.current_screen {
+        CurrentScreen::Manage => {
+            Paragraph::new(Line::from("Manage").fg(Color::Black).bg(Color::LightYellow)).centered()
+        }
+        _ => Paragraph::new(Line::from("Manage")).centered(),
+    };
+    frame.render_widget(manage_tab, tab_chunks[1]);
+
+    let stats_tab = match app.current_screen {
+        CurrentScreen::Stats => {
+            Paragraph::new(Line::from("Stats").fg(Color::Black).bg(Color::LightYellow)).centered()
+        }
+        _ => Paragraph::new(Line::from("Stats")).centered(),
+    };
+    frame.render_widget(stats_tab, tab_chunks[2]);
 
     let current_keys_hint = {
         match app.current_screen {
@@ -79,7 +86,6 @@ pub fn ui(frame: &mut Frame, app: &App) {
         .constraints([Constraint::Min(1), Constraint::Length(3)])
         .split(chunks[2]);
 
-    frame.render_widget(mode_footer, chunks[1]);
     frame.render_widget(key_notes_footer, body_chunks[1]);
 }
 
