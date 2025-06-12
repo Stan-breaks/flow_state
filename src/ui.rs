@@ -1,8 +1,7 @@
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style, Stylize},
-    symbols::border,
-    text::{Line, Span, Text},
+    text::Line,
     widgets::{Block, Borders, List, ListItem, Paragraph},
     Frame,
 };
@@ -71,7 +70,16 @@ pub fn ui(frame: &mut Frame, app: &App) {
 
     match app.current_screen {
         CurrentScreen::Today => {
-            let footer_items = vec![
+            let footer_area = body_chunks[1];
+            let footer_block = Block::default().borders(Borders::ALL);
+            frame.render_widget(&footer_block, footer_area);
+
+            let inner_chunks = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints([Constraint::Min(1), Constraint::Min(1)])
+                .split(footer_block.inner(footer_area));
+
+            let stat_lines = vec![
                 ListItem::new(
                     Line::from("Today: ████████░░░░ 67% (4/6 active)")
                         .fg(Color::Green)
@@ -82,14 +90,16 @@ pub fn ui(frame: &mut Frame, app: &App) {
                         .fg(Color::Green)
                         .centered(),
                 ),
-                ListItem::new(
-                    Line::from("Toggle: 1-7 • Menu: hjkl • Views: TAB")
-                        .fg(Color::Green)
-                        .centered(),
-                ),
             ];
-            let footer = List::new(footer_items).block(Block::default().borders(Borders::ALL));
-            frame.render_widget(footer, body_chunks[1]);
+            let stat_list = List::new(stat_lines);
+            frame.render_widget(stat_list, inner_chunks[0]);
+
+            let hint = Paragraph::new(
+                Line::from("[0-9] Toggle Habits  •[↑↓]/[hjkl] Navigate • [TAB] Switch Views")
+                    .fg(Color::Green)
+                    .centered(),
+            );
+            frame.render_widget(hint, inner_chunks[1]);
         }
         CurrentScreen::Manage => {
             let hints = Paragraph::new(
