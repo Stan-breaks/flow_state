@@ -2,7 +2,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style},
     text::{Line, Span, Text},
-    widgets::{Block, Borders, Clear, List, ListItem, Paragraph, Wrap},
+    widgets::{block::Position, Block, Borders, Clear, List, ListItem, Paragraph, Wrap},
     Frame,
 };
 
@@ -104,9 +104,9 @@ pub fn ui(frame: &mut Frame, app: &App) {
         CurrentlyEditing::Key | CurrentlyEditing::Value => {
             let popup_block = Block::default()
                 .title("Enter a new key-value pair")
-                .borders(Borders::NONE)
-                .style(Style::default().bg(Color::default()))
-                .borders(Borders::ALL);
+                .borders(Borders::ALL)
+                .style(Style::default().bg(Color::default()));
+
             let area = centered_rect(60, 25, frame.area());
             frame.render_widget(popup_block, area);
 
@@ -137,8 +137,8 @@ pub fn ui(frame: &mut Frame, app: &App) {
         frame.render_widget(Clear, frame.area()); //this clears the entire screen and anything already drawn
         let popup_block = Block::default()
             .title("Y/N")
-            .borders(Borders::NONE)
-            .style(Style::default().bg(Color::DarkGray));
+            .borders(Borders::ALL)
+            .style(Style::default().bg(Color::default()));
 
         let exit_text = Text::styled(
             "Would you like to output the buffer as json? (y/n)",
