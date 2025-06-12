@@ -53,7 +53,7 @@ cargo build --release
 - `q` - Quit
 - `TAB` - Switch between views (Today/Manage/Stats)
 - `1-7` - Toggle habits in Today view
-- `hjkl` - Navigate (Vim-style)
+- `hjkl` - Navigate (Vim-motions)
 
 ### Views
 
