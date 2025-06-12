@@ -42,7 +42,8 @@ pub fn ui(frame: &mut Frame, app: &App) {
             Paragraph::new(Line::from("Today").fg(Color::Black).bg(Color::LightYellow)).centered()
         }
         _ => Paragraph::new(Line::from("Today")).centered(),
-    };
+    }
+    .block(Block::default().borders(Borders::ALL));
     frame.render_widget(today_tab, tab_chunks[0]);
 
     let manage_tab = match app.current_screen {
@@ -50,7 +51,8 @@ pub fn ui(frame: &mut Frame, app: &App) {
             Paragraph::new(Line::from("Manage").fg(Color::Black).bg(Color::LightYellow)).centered()
         }
         _ => Paragraph::new(Line::from("Manage")).centered(),
-    };
+    }
+    .block(Block::default().borders(Borders::ALL));
     frame.render_widget(manage_tab, tab_chunks[1]);
 
     let stats_tab = match app.current_screen {
@@ -58,35 +60,53 @@ pub fn ui(frame: &mut Frame, app: &App) {
             Paragraph::new(Line::from("Stats").fg(Color::Black).bg(Color::LightYellow)).centered()
         }
         _ => Paragraph::new(Line::from("Stats")).centered(),
-    };
+    }
+    .block(Block::default().borders(Borders::ALL));
     frame.render_widget(stats_tab, tab_chunks[2]);
-
-    let current_keys_hint = {
-        match app.current_screen {
-            CurrentScreen::Today => Span::styled(
-                "Today: ████████░░░░ 67% (4/6 active) \nWeek:  ███████░░░░░ 58% trending up ↗\nToggle: 1-7 • Menu: hjkl • Views: TAB",
-                Style::default().fg(Color::Red),
-            ),
-            CurrentScreen::Manage => Span::styled(
-                "[a] Add • [e] Edit • [d] Delete  [p] Pause/Resume • [↑↓] Navigate ",
-                Style::default().fg(Color::Red),
-            ),
-            CurrentScreen::Stats => Span::styled(
-                " [←→] Navigate • [P] Bulk pause • [s] Accept suggestion • [r] Reset habit",
-                Style::default().fg(Color::Red),
-            ),
-        }
-    };
-
-    let key_notes_footer =
-        Paragraph::new(Line::from(current_keys_hint)).block(Block::default().borders(Borders::ALL));
 
     let body_chunks = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([Constraint::Min(1), Constraint::Length(3)])
+        .constraints([Constraint::Min(1), Constraint::Length(4)])
         .split(chunks[2]);
 
-    frame.render_widget(key_notes_footer, body_chunks[1]);
+    match app.current_screen {
+        CurrentScreen::Today => {
+            let footer_chucks = Layout::default()
+                .direction(Direction::Vertical)
+                .constraints([
+                    Constraint::Percentage(25),
+                    Constraint::Percentage(25),
+                    Constraint::Percentage(25),
+                ])
+                .split(body_chunks[1]);
+            let today_stats = Line::from("Today: ████████░░░░ 67% (4/6 active)")
+                .fg(Color::Green)
+                .centered();
+            frame.render_widget(today_stats, footer_chucks[0]);
+            let weekly_stats = Line::from("Week:  ███████░░░░░ 58% trending up ↗")
+                .fg(Color::Green)
+                .centered();
+            frame.render_widget(weekly_stats, footer_chucks[1]);
+            let hints = Line::from("Toggle: 1-7 • Menu: hjkl • Views: TAB")
+                .fg(Color::Green)
+                .centered();
+            frame.render_widget(hints, footer_chucks[2]);
+        }
+        CurrentScreen::Manage => {
+            let hints = Line::from(
+                "[a] Add • [e] Edit • [d] Delete • [p] Pause/Resume • [↑↓]/[hjkl] Navigate",
+            )
+            .centered()
+            .fg(Color::Green);
+            frame.render_widget(hints, body_chunks[1]);
+        }
+        CurrentScreen::Stats => {
+            let hints = Line::from("[P] Bulk pause • [↑↓]/[hjkl] Navigate")
+                .fg(Color::Green)
+                .centered();
+            frame.render_widget(hints, body_chunks[1]);
+        }
+    }
 }
 
 /// helper function to create a centered rect using up certain percentage of the available rect `r`
