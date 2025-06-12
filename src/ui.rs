@@ -2,7 +2,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style},
     text::{Line, Span, Text},
-    widgets::{block::Position, Block, Borders, Clear, List, ListItem, Paragraph, Wrap},
+    widgets::{Block, Borders, Clear, List, ListItem, Paragraph, Wrap},
     Frame,
 };
 
@@ -109,6 +109,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
 
             let area = centered_rect(60, 25, frame.area());
             frame.render_widget(popup_block, area);
+            frame.render_widget(Clear, area);
 
             let popup_chunks = Layout::default()
                 .direction(Direction::Horizontal)
