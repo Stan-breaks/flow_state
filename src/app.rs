@@ -29,7 +29,6 @@ impl App {
             CurrentScreen::Today => self.current_screen = CurrentScreen::Manage,
             CurrentScreen::Manage => self.current_screen = CurrentScreen::Stats,
             CurrentScreen::Stats => self.current_screen = CurrentScreen::Today,
-            _ => {}
         };
     }
 }
