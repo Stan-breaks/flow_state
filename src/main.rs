@@ -79,33 +79,25 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     _ => {}
                 },
                 CurrentScreen::Editing if key.kind == KeyEventKind::Press => match key.code {
-                    KeyCode::Enter => {
-                        if let editing = &app.currently_editing {
-                            match editing {
-                                CurrentlyEditing::Key => {
-                                    app.currently_editing = CurrentlyEditing::Value;
-                                }
-                                CurrentlyEditing::Value => {
-                                    app.save_key_value();
-                                    app.current_screen = CurrentScreen::Main;
-                                }
-                                CurrentlyEditing::None => {}
-                            }
+                    KeyCode::Enter => match &app.currently_editing {
+                        CurrentlyEditing::Key => {
+                            app.currently_editing = CurrentlyEditing::Value;
                         }
-                    }
-                    KeyCode::Backspace => {
-                        if let editing = &app.currently_editing {
-                            match editing {
-                                CurrentlyEditing::Key => {
-                                    app.key_input.pop();
-                                }
-                                CurrentlyEditing::Value => {
-                                    app.value_input.pop();
-                                }
-                                CurrentlyEditing::None => {}
-                            }
+                        CurrentlyEditing::Value => {
+                            app.save_key_value();
+                            app.current_screen = CurrentScreen::Main;
                         }
-                    }
+                        CurrentlyEditing::None => {}
+                    },
+                    KeyCode::Backspace => match &app.currently_editing {
+                        CurrentlyEditing::Key => {
+                            app.key_input.pop();
+                        }
+                        CurrentlyEditing::Value => {
+                            app.value_input.pop();
+                        }
+                        CurrentlyEditing::None => {}
+                    },
                     KeyCode::Esc => {
                         app.current_screen = CurrentScreen::Main;
                         app.currently_editing = CurrentlyEditing::None;
@@ -113,19 +105,15 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                     KeyCode::Tab => {
                         app.toggle_editing();
                     }
-                    KeyCode::Char(value) => {
-                        if let editing = &app.currently_editing {
-                            match editing {
-                                CurrentlyEditing::Key => {
-                                    app.key_input.push(value);
-                                }
-                                CurrentlyEditing::Value => {
-                                    app.value_input.push(value);
-                                }
-                                CurrentlyEditing::None => {}
-                            }
+                    KeyCode::Char(value) => match &app.currently_editing {
+                        CurrentlyEditing::Key => {
+                            app.key_input.push(value);
                         }
-                    }
+                        CurrentlyEditing::Value => {
+                            app.value_input.push(value);
+                        }
+                        CurrentlyEditing::None => {}
+                    },
                     _ => {}
                 },
                 _ => {}
@@ -133,4 +121,3 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
         }
     }
 }
-
