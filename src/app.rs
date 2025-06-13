@@ -12,15 +12,15 @@ pub struct Habit {
     created: String,
 }
 pub struct App {
-    pub build_habit: Habit,
-    pub avoid_habit: Habit,
+    pub build_habit: Vec<Habit>,
+    pub avoid_habit: Vec<Habit>,
     pub current_screen: CurrentScreen,
 }
 impl App {
     pub fn new() -> Self {
         App {
-            build_habit: Habit::default(),
-            avoid_habit: Habit::default(),
+            build_habit: Vec::default(),
+            avoid_habit: Vec::default(),
             current_screen: CurrentScreen::Today,
         }
     }
