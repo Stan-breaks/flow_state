@@ -27,6 +27,9 @@ fn main() -> color_eyre::Result<()> {
 
     // create app and run it
     let mut app = App::new();
+
+    app.populate_dummy_data();
+
     let res = run_app(&mut terminal, &mut app);
 
     // restore terminal
