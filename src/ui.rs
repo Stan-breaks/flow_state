@@ -95,7 +95,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
             frame.render_widget(stat_list, inner_chunks[0]);
 
             let hint = Paragraph::new(
-                Line::from("[0-9] Toggle Habits  •[↑↓]/[hjkl] Navigate • [TAB] Switch Views")
+                Line::from("[1-7] Toggle Habits  •[↑↓]/[hjkl] Navigate • [TAB] Switch Views")
                     .fg(Color::Green)
                     .centered(),
             );
