@@ -1,5 +1,5 @@
 use ratatui::{
-    layout::{Constraint, Direction, Layout, Rect},
+    layout::{Constraint, Direction, Layout},
     style::{Color, Style, Stylize},
     text::Line,
     widgets::{Block, Borders, List, ListItem, Paragraph},
@@ -70,6 +70,35 @@ pub fn ui(frame: &mut Frame, app: &App) {
 
     match app.current_screen {
         CurrentScreen::Today => {
+            let habit_chucks = Layout::default()
+                .direction(Direction::Vertical)
+                .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+                .split(body_chunks[0]);
+
+            let build_habit = List::new(
+                app.build_habit
+                    .iter()
+                    .map(|habit| {
+                        ListItem::new(format!(
+                            "{} {} {} ",
+                            habit.name, habit.created, habit.frequency
+                        ))
+                    })
+                    .collect::<Vec<ListItem>>(),
+            );
+            frame.render_widget(build_habit, habit_chucks[0]);
+            let avoid_habit = List::new(
+                app.avoid_habit
+                    .iter()
+                    .map(|habit| {
+                        ListItem::new(format!(
+                            "{} {} {} ",
+                            habit.name, habit.created, habit.frequency
+                        ))
+                    })
+                    .collect::<Vec<ListItem>>(),
+            );
+            frame.render_widget(avoid_habit, habit_chucks[1]);
             let footer_area = body_chunks[1];
             let footer_block = Block::default().borders(Borders::ALL);
             frame.render_widget(&footer_block, footer_area);
@@ -122,27 +151,4 @@ pub fn ui(frame: &mut Frame, app: &App) {
             frame.render_widget(hints, body_chunks[1]);
         }
     }
-}
-
-/// helper function to create a centered rect using up certain percentage of the available rect `r`
-fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
-    // Cut the given rectangle into three vertical pieces
-    let popup_layout = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints([
-            Constraint::Percentage((100 - percent_y) / 2),
-            Constraint::Percentage(percent_y),
-            Constraint::Percentage((100 - percent_y) / 2),
-        ])
-        .split(r);
-
-    // Then cut the middle vertical piece into three width-wise pieces
-    Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([
-            Constraint::Percentage((100 - percent_x) / 2),
-            Constraint::Percentage(percent_x),
-            Constraint::Percentage((100 - percent_x) / 2),
-        ])
-        .split(popup_layout[1])[1] // Return the middle chunk
 }
