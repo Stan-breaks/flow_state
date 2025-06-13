@@ -28,7 +28,7 @@ fn main() -> color_eyre::Result<()> {
     // create app and run it
     let mut app = App::new();
 
-    app.populate_dummy_data();
+    app.load_habits().unwrap();
 
     let res = run_app(&mut terminal, &mut app);
 
@@ -53,7 +53,10 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                 continue;
             }
             match key.code {
-                KeyCode::Char('q') => break,
+                KeyCode::Char('q') => {
+                    app.save_habits().unwrap();
+                    break;
+                }
                 _ => {}
             };
             match app.current_screen {
