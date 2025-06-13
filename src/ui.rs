@@ -76,7 +76,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
                 .split(body_chunks[0]);
 
             let build_habit = List::new(
-                app.build_habit
+                app.build_habits
                     .iter()
                     .map(|habit| {
                         ListItem::new(format!(
@@ -85,10 +85,16 @@ pub fn ui(frame: &mut Frame, app: &App) {
                         ))
                     })
                     .collect::<Vec<ListItem>>(),
+            )
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .title("Build These Habits")
+                    .border_style(Style::default().fg(Color::Green)),
             );
             frame.render_widget(build_habit, habit_chucks[0]);
             let avoid_habit = List::new(
-                app.avoid_habit
+                app.avoid_habits
                     .iter()
                     .map(|habit| {
                         ListItem::new(format!(
@@ -97,6 +103,12 @@ pub fn ui(frame: &mut Frame, app: &App) {
                         ))
                     })
                     .collect::<Vec<ListItem>>(),
+            )
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .title("Avoid These Habits")
+                    .border_style(Style::default().fg(Color::Red)),
             );
             frame.render_widget(avoid_habit, habit_chucks[1]);
             let footer_area = body_chunks[1];
