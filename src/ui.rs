@@ -78,12 +78,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
             let build_habit = List::new(
                 app.build_habits
                     .iter()
-                    .map(|habit| {
-                        ListItem::new(format!(
-                            "{} {} {} ",
-                            habit.name, habit.created, habit.frequency
-                        ))
-                    })
+                    .map(|habit| ListItem::new(format!("{}, {}", habit.name, habit.created,)))
                     .collect::<Vec<ListItem>>(),
             )
             .block(
@@ -96,12 +91,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
             let avoid_habit = List::new(
                 app.avoid_habits
                     .iter()
-                    .map(|habit| {
-                        ListItem::new(format!(
-                            "{} {} {} ",
-                            habit.name, habit.created, habit.frequency
-                        ))
-                    })
+                    .map(|habit| ListItem::new(format!("{}, {}", habit.name, habit.created,)))
                     .collect::<Vec<ListItem>>(),
             )
             .block(
