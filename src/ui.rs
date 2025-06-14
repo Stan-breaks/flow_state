@@ -104,7 +104,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
             .block(
                 Block::default()
                     .borders(Borders::ALL)
-                    .title("Build These Habits")
+                    .title("🌟 Build These Habits")
                     .border_style(Style::default().fg(Color::Green)),
             );
             frame.render_widget(build_habit, habit_chucks[0]);
@@ -138,7 +138,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
             .block(
                 Block::default()
                     .borders(Borders::ALL)
-                    .title("Avoid These Habits")
+                    .title("🚫 Avoid These Habits")
                     .border_style(Style::default().fg(Color::Red)),
             );
             frame.render_widget(avoid_habit, habit_chucks[1]);
