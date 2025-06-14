@@ -3,7 +3,7 @@ use std::{
     fs::{create_dir_all, read_to_string, write},
 };
 
-use chrono::{NaiveDate, NaiveWeek, Weekday};
+use chrono::{NaiveDate, Weekday};
 use serde::{Deserialize, Serialize};
 
 pub enum CurrentScreen {
