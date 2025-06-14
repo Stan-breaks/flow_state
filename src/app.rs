@@ -11,6 +11,18 @@ pub enum CurrentScreen {
     Manage,
     Stats,
 }
+pub enum HabitStatus {
+    Complete,
+    InComplete,
+}
+impl HabitStatus {
+    pub fn emoji(&self) -> &'static str {
+        match self {
+            HabitStatus::Complete => "✅",
+            HabitStatus::InComplete => "⚪",
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Completed {
@@ -23,6 +35,11 @@ pub struct Habit {
     pub name: String,
     pub days_completed: Vec<Completed>,
     pub created: NaiveDate,
+}
+impl Habit {
+    pub fn check_status(&self) -> HabitStatus {
+        for i in &self.days_completed.iter() {}
+    }
 }
 #[derive(Serialize, Deserialize, Clone)]
 struct HabitsData {
