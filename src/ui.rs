@@ -80,13 +80,24 @@ pub fn ui(frame: &mut Frame, app: &App) {
                     .iter()
                     .enumerate()
                     .map(|(index, habit)| {
-                        ListItem::new(format!(
-                            "[{}]. {}, {}  {}",
-                            index + 1,
-                            habit.name,
-                            habit.created,
-                            habit.days_completed.len()
-                        ))
+                        if index + 1 == app.habits_counter {
+                            ListItem::new(format!(
+                                "[{}]. {}, {}  {}",
+                                index + 1,
+                                habit.name,
+                                habit.created,
+                                habit.days_completed.len()
+                            ))
+                            .bg(Color::Green)
+                        } else {
+                            ListItem::new(format!(
+                                "[{}]. {}, {}  {}",
+                                index + 1,
+                                habit.name,
+                                habit.created,
+                                habit.days_completed.len()
+                            ))
+                        }
                     })
                     .collect::<Vec<ListItem>>(),
             )
@@ -103,13 +114,24 @@ pub fn ui(frame: &mut Frame, app: &App) {
                     .iter()
                     .enumerate()
                     .map(|(index, habit)| {
-                        ListItem::new(format!(
-                            "[{}]. {}, {}  {}",
-                            index + build_habits_len,
-                            habit.name,
-                            habit.created,
-                            habit.days_completed.len()
-                        ))
+                        if index + build_habits_len == app.habits_counter {
+                            ListItem::new(format!(
+                                "[{}]. {}, {}  {}",
+                                index + build_habits_len,
+                                habit.name,
+                                habit.created,
+                                habit.days_completed.len()
+                            ))
+                            .bg(Color::Red)
+                        } else {
+                            ListItem::new(format!(
+                                "[{}]. {}, {}  {}",
+                                index + build_habits_len,
+                                habit.name,
+                                habit.created,
+                                habit.days_completed.len()
+                            ))
+                        }
                     })
                     .collect::<Vec<ListItem>>(),
             )
