@@ -64,6 +64,12 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                     KeyCode::Tab => {
                         app.toggle_page();
                     }
+                    KeyCode::Char('j') | KeyCode::Down => {
+                        app.increment_habits_counter();
+                    }
+                    KeyCode::Char('k') | KeyCode::Up => {
+                        app.decrement_habits_counter();
+                    }
                     _ => {}
                 },
                 CurrentScreen::Manage => match key.code {
