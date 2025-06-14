@@ -78,7 +78,16 @@ pub fn ui(frame: &mut Frame, app: &App) {
             let build_habit = List::new(
                 app.build_habits
                     .iter()
-                    .map(|habit| ListItem::new(format!("{}, {}", habit.name, habit.created,)))
+                    .enumerate()
+                    .map(|(index, habit)| {
+                        ListItem::new(format!(
+                            "[{}]. {}, {}  {}",
+                            index + 1,
+                            habit.name,
+                            habit.created,
+                            habit.days_completed.len()
+                        ))
+                    })
                     .collect::<Vec<ListItem>>(),
             )
             .block(
@@ -88,10 +97,20 @@ pub fn ui(frame: &mut Frame, app: &App) {
                     .border_style(Style::default().fg(Color::Green)),
             );
             frame.render_widget(build_habit, habit_chucks[0]);
+            let build_habits_len = app.build_habits.len() + 1;
             let avoid_habit = List::new(
                 app.avoid_habits
                     .iter()
-                    .map(|habit| ListItem::new(format!("{}, {}", habit.name, habit.created,)))
+                    .enumerate()
+                    .map(|(index, habit)| {
+                        ListItem::new(format!(
+                            "[{}]. {}, {}  {}",
+                            index + build_habits_len,
+                            habit.name,
+                            habit.created,
+                            habit.days_completed.len()
+                        ))
+                    })
                     .collect::<Vec<ListItem>>(),
             )
             .block(
@@ -117,7 +136,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
                         .centered(),
                 ),
                 ListItem::new(
-                    Line::from("Week:  ███████░░░░░ 58% trending up ↗")
+                    Line::from("Week: ███████░░░░░ 58% trending up ↗")
                         .fg(Color::Green)
                         .centered(),
                 ),
