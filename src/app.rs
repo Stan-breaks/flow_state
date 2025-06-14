@@ -14,7 +14,6 @@ pub enum CurrentScreen {
 #[derive(Default, Serialize, Deserialize, Clone)]
 pub struct Habit {
     pub name: String,
-    pub frequency: String,
     pub created: String,
 }
 #[derive(Serialize, Deserialize, Clone)]
@@ -77,12 +76,10 @@ impl App {
         self.build_habits = vec![
             Habit {
                 name: "Morning run".to_string(),
-                frequency: "Daily".to_string(),
                 created: "2025-06-13".to_string(),
             },
             Habit {
                 name: "Read 10 pages".to_string(),
-                frequency: "Daily".to_string(),
                 created: "2025-06-12".to_string(),
             },
         ];
@@ -90,12 +87,10 @@ impl App {
         self.avoid_habits = vec![
             Habit {
                 name: "Social media scrolling".to_string(),
-                frequency: "Daily".to_string(),
                 created: "2025-06-10".to_string(),
             },
             Habit {
                 name: "Late-night snacking".to_string(),
-                frequency: "Weekly".to_string(),
                 created: "2025-06-09".to_string(),
             },
         ];
