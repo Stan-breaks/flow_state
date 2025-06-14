@@ -32,6 +32,7 @@ struct HabitsData {
 pub struct App {
     pub build_habits: Vec<Habit>,
     pub avoid_habits: Vec<Habit>,
+    pub habits_counter: usize,
     pub current_screen: CurrentScreen,
 }
 impl App {
@@ -39,6 +40,7 @@ impl App {
         App {
             build_habits: Vec::default(),
             avoid_habits: Vec::default(),
+            habits_counter: 0,
             current_screen: CurrentScreen::Today,
         }
     }
@@ -106,5 +108,15 @@ impl App {
                 created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
         ];
+    }
+    pub fn increment_habits_counter(&mut self) {
+        if self.habits_counter < self.avoid_habits.len() + self.build_habits.len() {
+            self.habits_counter += 1;
+        }
+    }
+    pub fn decrement_habits_counter(&mut self) {
+        if self.habits_counter > 0 {
+            self.habits_counter -= 1;
+        }
     }
 }
