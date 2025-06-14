@@ -3,6 +3,7 @@ use std::{
     fs::{create_dir_all, read_to_string, write},
 };
 
+use chrono::{NaiveDate, NaiveWeek, Weekday};
 use serde::{Deserialize, Serialize};
 
 pub enum CurrentScreen {
@@ -11,10 +12,17 @@ pub enum CurrentScreen {
     Stats,
 }
 
-#[derive(Default, Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Completed {
+    date: NaiveDate,
+    day: Weekday,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Habit {
     pub name: String,
-    pub created: String,
+    pub days_completed: Vec<Completed>,
+    pub created: NaiveDate,
 }
 #[derive(Serialize, Deserialize, Clone)]
 struct HabitsData {
@@ -76,22 +84,26 @@ impl App {
         self.build_habits = vec![
             Habit {
                 name: "Morning run".to_string(),
-                created: "2025-06-13".to_string(),
+                days_completed: vec![],
+                created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
             Habit {
                 name: "Read 10 pages".to_string(),
-                created: "2025-06-12".to_string(),
+                days_completed: vec![],
+                created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
         ];
 
         self.avoid_habits = vec![
             Habit {
                 name: "Social media scrolling".to_string(),
-                created: "2025-06-10".to_string(),
+                days_completed: vec![],
+                created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
             Habit {
                 name: "Late-night snacking".to_string(),
-                created: "2025-06-09".to_string(),
+                days_completed: vec![],
+                created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
         ];
     }
