@@ -1,9 +1,10 @@
 use std::{
+    collections::HashSet,
     error::Error,
     fs::{create_dir_all, read_to_string, write},
 };
 
-use chrono::{NaiveDate, Utc, Weekday};
+use chrono::{Datelike, NaiveDate, Utc, Weekday};
 use serde::{Deserialize, Serialize};
 
 pub enum CurrentScreen {
@@ -24,7 +25,7 @@ impl HabitStatus {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct Completed {
     date: NaiveDate,
     day: Weekday,
@@ -33,7 +34,7 @@ pub struct Completed {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Habit {
     pub name: String,
-    pub days_completed: Vec<Completed>,
+    pub days_completed: HashSet<Completed>,
     pub created: NaiveDate,
 }
 impl Habit {
@@ -45,6 +46,16 @@ impl Habit {
             }
         }
         HabitStatus::InComplete
+    }
+    pub fn toggle_complete(&mut self) {
+        let today = Utc::now();
+        let day_completed = Completed {
+            date: today.date_naive(),
+            day: today.weekday(),
+        };
+        if !self.days_completed.insert(day_completed.clone()) {
+            self.days_completed.remove(&day_completed);
+        }
     }
 }
 #[derive(Serialize, Deserialize, Clone)]
@@ -109,12 +120,12 @@ impl App {
         self.build_habits = vec![
             Habit {
                 name: "Morning run".to_string(),
-                days_completed: vec![],
+                days_completed: HashSet::new(),
                 created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
             Habit {
                 name: "Read 10 pages".to_string(),
-                days_completed: vec![],
+                days_completed: HashSet::new(),
                 created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
         ];
@@ -122,12 +133,12 @@ impl App {
         self.avoid_habits = vec![
             Habit {
                 name: "Social media scrolling".to_string(),
-                days_completed: vec![],
+                days_completed: HashSet::new(),
                 created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
             Habit {
                 name: "Late-night snacking".to_string(),
-                days_completed: vec![],
+                days_completed: HashSet::new(),
                 created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
         ];
