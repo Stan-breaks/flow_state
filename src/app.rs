@@ -3,7 +3,7 @@ use std::{
     fs::{create_dir_all, read_to_string, write},
 };
 
-use chrono::{NaiveDate, Weekday};
+use chrono::{NaiveDate, Utc, Weekday};
 use serde::{Deserialize, Serialize};
 
 pub enum CurrentScreen {
@@ -38,7 +38,13 @@ pub struct Habit {
 }
 impl Habit {
     pub fn check_status(&self) -> HabitStatus {
-        for i in &self.days_completed.iter() {}
+        let today = Utc::now().date_naive();
+        for i in self.days_completed.iter() {
+            if today == i.date {
+                return HabitStatus::Complete;
+            }
+        }
+        HabitStatus::InComplete
     }
 }
 #[derive(Serialize, Deserialize, Clone)]
