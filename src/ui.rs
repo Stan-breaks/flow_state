@@ -82,7 +82,8 @@ pub fn ui(frame: &mut Frame, app: &App) {
                     .map(|(index, habit)| {
                         if index + 1 == app.habits_counter {
                             ListItem::new(format!(
-                                "[{}]. {}, {}  {}",
+                                "{} [{}]. {}, {}  {}",
+                                habit.check_status().emoji(),
                                 index + 1,
                                 habit.name,
                                 habit.created,
@@ -91,7 +92,8 @@ pub fn ui(frame: &mut Frame, app: &App) {
                             .bg(Color::Green)
                         } else {
                             ListItem::new(format!(
-                                "[{}]. {}, {}  {}",
+                                "{} [{}]. {}, {}  {}",
+                                habit.check_status().emoji(),
                                 index + 1,
                                 habit.name,
                                 habit.created,
@@ -116,7 +118,8 @@ pub fn ui(frame: &mut Frame, app: &App) {
                     .map(|(index, habit)| {
                         if index + build_habits_len == app.habits_counter {
                             ListItem::new(format!(
-                                "[{}]. {}, {}  {}",
+                                "{} [{}]. {}, {}  {}",
+                                habit.check_status().emoji(),
                                 index + build_habits_len,
                                 habit.name,
                                 habit.created,
@@ -125,7 +128,8 @@ pub fn ui(frame: &mut Frame, app: &App) {
                             .bg(Color::Red)
                         } else {
                             ListItem::new(format!(
-                                "[{}]. {}, {}  {}",
+                                "{} [{}]. {}, {}  {}",
+                                habit.check_status().emoji(),
                                 index + build_habits_len,
                                 habit.name,
                                 habit.created,
