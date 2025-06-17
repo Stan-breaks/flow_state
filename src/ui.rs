@@ -162,7 +162,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
                         .centered(),
                 ),
                 ListItem::new(
-                    Line::from("Week: ███████░░░░░ 58% trending up ↗")
+                    Line::from(format!("Week: {}", app.check_weeks_progress()))
                         .fg(Color::Green)
                         .centered(),
                 ),
