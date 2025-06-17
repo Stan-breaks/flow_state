@@ -58,6 +58,7 @@ impl Habit {
         }
     }
 }
+
 #[derive(Serialize, Deserialize, Clone)]
 struct HabitsData {
     build_habits: Vec<Habit>,
@@ -152,5 +153,51 @@ impl App {
         if self.habits_counter > 0 {
             self.habits_counter -= 1;
         }
+    }
+    pub fn check_todays_progress(&self) -> String {
+        let length = self.build_habits.len() + self.avoid_habits.len();
+        if length == 0 {
+            return self.display_gauge(0.0);
+        }
+
+        let today = Utc::now();
+        let today = Completed {
+            date: today.date_naive(),
+            day: today.weekday(),
+        };
+
+        let mut counter = 0;
+        for habit in self.build_habits.iter() {
+            if habit.days_completed.contains(&today) {
+                counter += 1;
+            }
+        }
+        for habit in self.avoid_habits.iter() {
+            if habit.days_completed.contains(&today) {
+                counter += 1;
+            }
+        }
+
+        let progress = (counter as f32 / length as f32) * 100.0;
+        format!("{}  ({}/{})", self.display_gauge(progress), counter, length)
+    }
+
+    fn display_gauge(&self, progress: f32) -> String {
+        let segments = [
+            "▱▱▱▱▱▱▱▱▱▱", // 0%
+            "▰▱▱▱▱▱▱▱▱▱", // 10%
+            "▰▰▱▱▱▱▱▱▱▱", // 20%
+            "▰▰▰▱▱▱▱▱▱▱", // 30%
+            "▰▰▰▰▱▱▱▱▱▱", // 40%
+            "▰▰▰▰▰▱▱▱▱▱", // 50%
+            "▰▰▰▰▰▰▱▱▱▱", // 60%
+            "▰▰▰▰▰▰▰▱▱▱", // 70%
+            "▰▰▰▰▰▰▰▰▱▱", // 80%
+            "▰▰▰▰▰▰▰▰▰▱", // 90%
+            "▰▰▰▰▰▰▰▰▰▰", // 100%
+        ];
+
+        let index = ((progress / 10.0) as usize).min(10);
+        format!("{} {:.1}%", segments[index], progress,)
     }
 }
