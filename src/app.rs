@@ -4,7 +4,7 @@ use std::{
     fs::{create_dir_all, read_to_string, write},
 };
 
-use chrono::{Datelike, NaiveDate, Utc, Weekday};
+use chrono::{Datelike, Duration, NaiveDate, Utc, Weekday};
 use serde::{Deserialize, Serialize};
 
 pub enum CurrentScreen {
@@ -154,10 +154,28 @@ impl App {
             self.habits_counter -= 1;
         }
     }
+    fn display_gauge(&self, progress: f32) -> String {
+        let segments = [
+            "▱▱▱▱▱▱▱▱▱▱", // 0%
+            "▰▱▱▱▱▱▱▱▱▱", // 10%
+            "▰▰▱▱▱▱▱▱▱▱", // 20%
+            "▰▰▰▱▱▱▱▱▱▱", // 30%
+            "▰▰▰▰▱▱▱▱▱▱", // 40%
+            "▰▰▰▰▰▱▱▱▱▱", // 50%
+            "▰▰▰▰▰▰▱▱▱▱", // 60%
+            "▰▰▰▰▰▰▰▱▱▱", // 70%
+            "▰▰▰▰▰▰▰▰▱▱", // 80%
+            "▰▰▰▰▰▰▰▰▰▱", // 90%
+            "▰▰▰▰▰▰▰▰▰▰", // 100%
+        ];
+
+        let index = ((progress / 10.0) as usize).min(10);
+        format!("{} {:.1}%", segments[index], progress,)
+    }
     pub fn check_todays_progress(&self) -> String {
         let length = self.build_habits.len() + self.avoid_habits.len();
         if length == 0 {
-            return self.display_gauge(0.0);
+            return format!("{}  ({}/{})", self.display_gauge(0.0), 0, length);
         }
 
         let today = Utc::now();
@@ -181,23 +199,46 @@ impl App {
         let progress = (counter as f32 / length as f32) * 100.0;
         format!("{}  ({}/{})", self.display_gauge(progress), counter, length)
     }
+    pub fn check_weeks_progress(&self) -> String {
+        let total_habits = self.build_habits.len() + self.avoid_habits.len();
+        if total_habits == 0 {
+            return format!("{}  ({}/{})", self.display_gauge(0.0), 0, 0);
+        }
+        let today = Utc::now();
+        let today = Completed {
+            date: today.date_naive(),
+            day: today.weekday(),
+        };
+        let day_since_monday = today.day.num_days_from_monday();
+        let week_start = today.date - Duration::days(day_since_monday as i64);
 
-    fn display_gauge(&self, progress: f32) -> String {
-        let segments = [
-            "▱▱▱▱▱▱▱▱▱▱", // 0%
-            "▰▱▱▱▱▱▱▱▱▱", // 10%
-            "▰▰▱▱▱▱▱▱▱▱", // 20%
-            "▰▰▰▱▱▱▱▱▱▱", // 30%
-            "▰▰▰▰▱▱▱▱▱▱", // 40%
-            "▰▰▰▰▰▱▱▱▱▱", // 50%
-            "▰▰▰▰▰▰▱▱▱▱", // 60%
-            "▰▰▰▰▰▰▰▱▱▱", // 70%
-            "▰▰▰▰▰▰▰▰▱▱", // 80%
-            "▰▰▰▰▰▰▰▰▰▱", // 90%
-            "▰▰▰▰▰▰▰▰▰▰", // 100%
-        ];
+        let total_possible = total_habits * 7;
+        let mut counter = 0;
+        for i in 0..7 {
+            let check_date = week_start + Duration::days(i);
+            let check_datetime = check_date.and_hms_opt(0, 0, 0).unwrap();
+            let check_day = Completed {
+                date: check_date,
+                day: check_datetime.weekday(),
+            };
+            for j in self.build_habits.iter() {
+                if j.days_completed.contains(&check_day) {
+                    counter += 1
+                }
+            }
+            for j in self.avoid_habits.iter() {
+                if j.days_completed.contains(&check_day) {
+                    counter += 1
+                }
+            }
+        }
+        let progress = (counter as f32) / (total_possible as f32);
 
-        let index = ((progress / 10.0) as usize).min(10);
-        format!("{} {:.1}%", segments[index], progress,)
+        format!(
+            "{}  ({}/{})",
+            self.display_gauge(progress),
+            counter,
+            total_possible
+        )
     }
 }
