@@ -157,7 +157,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
 
             let stat_lines = vec![
                 ListItem::new(
-                    Line::from("Today: ████████░░░░ 67% (4/6 active)")
+                    Line::from(format!("Today: {}", app.check_todays_progress()))
                         .fg(Color::Green)
                         .centered(),
                 ),
