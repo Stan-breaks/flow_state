@@ -24,7 +24,7 @@ impl HabitStatus {
         }
     }
 }
-
+//some dumb comment
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct Completed {
     date: NaiveDate,
