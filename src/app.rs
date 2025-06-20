@@ -9,7 +9,6 @@ use serde::{Deserialize, Serialize};
 
 pub enum CurrentScreen {
     Today,
-    Manage,
     Stats,
 }
 pub enum HabitStatus {
@@ -81,8 +80,7 @@ impl App {
     }
     pub fn toggle_page(&mut self) {
         match &self.current_screen {
-            CurrentScreen::Today => self.current_screen = CurrentScreen::Manage,
-            CurrentScreen::Manage => self.current_screen = CurrentScreen::Stats,
+            CurrentScreen::Today => self.current_screen = CurrentScreen::Stats,
             CurrentScreen::Stats => self.current_screen = CurrentScreen::Today,
         };
     }
