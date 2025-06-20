@@ -212,8 +212,8 @@ fn render_float(frame: &mut Frame, height: u16, width: u16) {
     let area = Rect::new(
         (width as f32 * 0.2) as u16,
         (height as f32 * 0.2) as u16,
-        width - (width as f32 * 0.8) as u16,
-        height - (height as f32 * 0.8) as u16,
+        width - (width as f32 * 0.6) as u16,
+        height - (height as f32 * 0.6) as u16,
     );
     let block = Block::new().borders(Borders::all()).bg(Color::Red);
     frame.render_widget(block, area);
