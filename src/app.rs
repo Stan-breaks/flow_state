@@ -11,6 +11,12 @@ pub enum CurrentScreen {
     Today,
     Stats,
 }
+
+pub enum ScreenMode {
+    Normal,
+    Editing,
+}
+
 pub enum HabitStatus {
     Complete,
     InComplete,
@@ -68,6 +74,7 @@ pub struct App {
     pub avoid_habits: Vec<Habit>,
     pub habits_counter: usize,
     pub current_screen: CurrentScreen,
+    pub screen_mode: ScreenMode,
 }
 impl App {
     pub fn new() -> Self {
@@ -76,6 +83,7 @@ impl App {
             avoid_habits: Vec::default(),
             habits_counter: 0,
             current_screen: CurrentScreen::Today,
+            screen_mode: ScreenMode::Normal,
         }
     }
     pub fn toggle_page(&mut self) {
