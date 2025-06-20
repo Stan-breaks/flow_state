@@ -81,13 +81,6 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                     }
                     _ => {}
                 },
-                CurrentScreen::Manage => match key.code {
-                    KeyCode::Tab => {
-                        app.toggle_page();
-                    }
-
-                    _ => {}
-                },
                 CurrentScreen::Stats => match key.code {
                     KeyCode::Tab => {
                         app.toggle_page();
