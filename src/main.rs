@@ -52,13 +52,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
             if key.kind == event::KeyEventKind::Release {
                 continue;
             }
-            match key.code {
-                KeyCode::Char('q') => {
-                    app.save_habits().unwrap();
-                    break;
-                }
-                _ => {}
-            };
+
             match app.current_screen {
                 CurrentScreen::Today => match key.code {
                     KeyCode::Tab => {
@@ -73,12 +67,6 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                     KeyCode::Char('a') => match app.screen_mode {
                         ScreenMode::Normal => {
                             app.toggle_edit_mode();
-                        }
-                        _ => {}
-                    },
-                    KeyCode::Char('q') => match app.screen_mode {
-                        ScreenMode::Editing => {
-                            app.toggle_normal_mode();
                         }
                         _ => {}
                     },
@@ -100,6 +88,18 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                     _ => {}
                 },
             }
+            match key.code {
+                KeyCode::Char('q') => match app.screen_mode {
+                    ScreenMode::Normal => {
+                        app.save_habits().unwrap();
+                        break;
+                    }
+                    ScreenMode::Editing => {
+                        app.toggle_normal_mode();
+                    }
+                },
+                _ => {}
+            };
         }
     }
     Ok(())
