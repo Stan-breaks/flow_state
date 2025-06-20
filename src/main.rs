@@ -13,7 +13,7 @@ use ratatui::{
 mod app;
 mod ui;
 use crate::{
-    app::{App, CurrentScreen},
+    app::{App, CurrentScreen, ScreenMode},
     ui::ui,
 };
 
@@ -70,6 +70,18 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                     KeyCode::Char('k') | KeyCode::Up => {
                         app.decrement_habits_counter();
                     }
+                    KeyCode::Char('a') => match app.screen_mode {
+                        ScreenMode::Normal => {
+                            app.toggle_edit_mode();
+                        }
+                        _ => {}
+                    },
+                    KeyCode::Char('q') => match app.screen_mode {
+                        ScreenMode::Editing => {
+                            app.toggle_normal_mode();
+                        }
+                        _ => {}
+                    },
                     KeyCode::Enter => {
                         let build_habit_len = app.build_habits.len();
                         if app.habits_counter <= build_habit_len {
