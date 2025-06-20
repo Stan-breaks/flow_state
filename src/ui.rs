@@ -1,6 +1,6 @@
-use std::rc::Rc;
+use std::{f32, rc::Rc};
 
-use crate::app::{App, CurrentScreen};
+use crate::app::{App, CurrentScreen, ScreenMode};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style, Stylize},
@@ -28,6 +28,13 @@ fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame, app: &App) {
     render_title(chunks[0], frame);
     render_tab(chunks[1], frame, app);
     render_body(chunks[2], frame, app);
+    let area = frame.area();
+    match app.screen_mode {
+        ScreenMode::Editing => {
+            render_float(frame, area.height, area.width);
+        }
+        _ => {}
+    };
 }
 
 fn render_title(chunk: Rect, frame: &mut Frame) {
@@ -201,6 +208,13 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
         }
     }
 }
-fn render_float(frame: &mut Frame, height: usize, width: usize) {
-    let mut area = Rect::new(x, y, width, height);
+fn render_float(frame: &mut Frame, height: u16, width: u16) {
+    let area = Rect::new(
+        (width as f32 * 0.02) as u16,
+        (height as f32 * 0.02) as u16,
+        width - (width as f32 * 0.02) as u16,
+        height - (height as f32 * 0.02) as u16,
+    );
+    let block = Block::new().borders(Borders::all());
+    frame.render_widget(block, area);
 }
