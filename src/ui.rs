@@ -20,6 +20,10 @@ fn create_main_layout(frame: &mut Frame) -> Rc<[Rect]> {
         .split(frame.area())
 }
 fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame) {
+    render_title(chunks[0], frame);
+}
+
+fn render_title(chunk: Rect, frame: &mut Frame) {
     let title_items = vec![
         ListItem::new(
             Line::from("🌊 Flow State 🌊")
@@ -29,8 +33,7 @@ fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame) {
         ListItem::new(Line::from("Progress Stats").centered()),
     ];
     let title = List::new(title_items).block(Block::default().borders(Borders::ALL));
-
-    frame.render_widget(title, chunks[0]);
+    frame.render_widget(title, chunk);
 }
 
 pub fn ui(frame: &mut Frame, app: &App) {
