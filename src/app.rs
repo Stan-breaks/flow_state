@@ -247,4 +247,10 @@ impl App {
             total_possible
         )
     }
+    pub fn toggle_screen_mode(&mut self) {
+        match self.screen_mode {
+            ScreenMode::Normal => self.screen_mode = ScreenMode::Editing,
+            ScreenMode::Editing => self.screen_mode = ScreenMode::Normal,
+        }
+    }
 }
