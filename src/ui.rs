@@ -1,23 +1,28 @@
+use std::rc::Rc;
+
+use crate::app::{App, CurrentScreen};
 use ratatui::{
-    layout::{Constraint, Direction, Layout},
+    layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style, Stylize},
     text::Line,
     widgets::{Block, Borders, List, ListItem, Paragraph},
     Frame,
 };
 
-use crate::app::{App, CurrentScreen};
-
-pub fn ui(frame: &mut Frame, app: &App) {
-    // Create the layout sections.
-    let chunks = Layout::default()
+fn create_main_layout(frame: &mut Frame) -> Rc<[Rect]> {
+    Layout::default()
         .direction(Direction::Vertical)
         .constraints([
             Constraint::Length(4),
             Constraint::Length(3),
             Constraint::Min(1),
         ])
-        .split(frame.area());
+        .split(frame.area())
+}
+
+pub fn ui(frame: &mut Frame, app: &App) {
+    // Create the layout sections.
+    let chunks = create_main_layout(frame);
 
     let title_items = vec![
         ListItem::new(
