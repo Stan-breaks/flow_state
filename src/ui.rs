@@ -201,3 +201,6 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
         }
     }
 }
+fn render_float(frame: &mut Frame, height: usize, width: usize) {
+    let mut area = Rect::new(x, y, width, height);
+}
