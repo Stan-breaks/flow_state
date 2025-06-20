@@ -9,6 +9,11 @@ use ratatui::{
     Frame,
 };
 
+pub fn ui(frame: &mut Frame, app: &App) {
+    let chunks = create_main_layout(frame);
+    render_main_ui(&chunks, frame, app);
+}
+
 fn create_main_layout(frame: &mut Frame) -> Rc<[Rect]> {
     Layout::default()
         .direction(Direction::Vertical)
@@ -22,6 +27,7 @@ fn create_main_layout(frame: &mut Frame) -> Rc<[Rect]> {
 fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame, app: &App) {
     render_title(chunks[0], frame);
     render_tab(chunks[1], frame, app);
+    render_body(chunks[2], frame, app);
 }
 
 fn render_title(chunk: Rect, frame: &mut Frame) {
@@ -36,6 +42,7 @@ fn render_title(chunk: Rect, frame: &mut Frame) {
     let title = List::new(title_items).block(Block::default().borders(Borders::ALL));
     frame.render_widget(title, chunk);
 }
+
 fn render_tab(chunk: Rect, frame: &mut Frame, app: &App) {
     let tab_chunks = Layout::default()
         .direction(Direction::Horizontal)
@@ -61,16 +68,11 @@ fn render_tab(chunk: Rect, frame: &mut Frame, app: &App) {
     frame.render_widget(stats_tab, tab_chunks[1]);
 }
 
-pub fn ui(frame: &mut Frame, app: &App) {
-    // Create the layout sections.
-    let chunks = create_main_layout(frame);
-
-    render_main_ui(&chunks, frame, app);
+fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
     let body_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([Constraint::Min(1), Constraint::Length(4)])
-        .split(chunks[2]);
-
+        .split(chunk);
     match app.current_screen {
         CurrentScreen::Today => {
             let habit_chucks = Layout::default()
