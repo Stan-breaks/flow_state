@@ -19,11 +19,7 @@ fn create_main_layout(frame: &mut Frame) -> Rc<[Rect]> {
         ])
         .split(frame.area())
 }
-
-pub fn ui(frame: &mut Frame, app: &App) {
-    // Create the layout sections.
-    let chunks = create_main_layout(frame);
-
+fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame) {
     let title_items = vec![
         ListItem::new(
             Line::from("🌊 Flow State 🌊")
@@ -35,7 +31,13 @@ pub fn ui(frame: &mut Frame, app: &App) {
     let title = List::new(title_items).block(Block::default().borders(Borders::ALL));
 
     frame.render_widget(title, chunks[0]);
+}
 
+pub fn ui(frame: &mut Frame, app: &App) {
+    // Create the layout sections.
+    let chunks = create_main_layout(frame);
+
+    render_main_ui(&chunks, frame);
     let tab_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Min(1), Constraint::Min(1)])
