@@ -161,12 +161,20 @@ pub fn ui(frame: &mut Frame, app: &App) {
             let stat_list = List::new(stat_lines);
             frame.render_widget(stat_list, inner_chunks[0]);
 
-            let hint = Paragraph::new(
-                Line::from("[Enter] Toggle Habits  •[↑↓]/[hjkl] Navigate • [TAB] Switch Views")
-                    .fg(Color::Green)
-                    .centered(),
-            );
-            frame.render_widget(hint, inner_chunks[1]);
+            let hint_lines = vec![
+                ListItem::new(
+                    Line::from("[Enter] Toggle Habits • [↑↓]/[hjkl] Navigate • [TAB] Switch Views")
+                        .fg(Color::Green)
+                        .centered(),
+                ),
+                ListItem::new(
+                    Line::from("[a] Add • [e] Edit • [d] Delete • [p] Pause/Resume ")
+                        .fg(Color::Green)
+                        .centered(),
+                ),
+            ];
+            let hint_list = List::new(hint_lines);
+            frame.render_widget(hint_list, inner_chunks[1]);
         }
         CurrentScreen::Stats => {
             let hints = Paragraph::new(
