@@ -33,7 +33,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
 
     let tab_chunks = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints([Constraint::Min(1), Constraint::Min(1), Constraint::Min(1)])
+        .constraints([Constraint::Min(1), Constraint::Min(1)])
         .split(chunks[1]);
 
     let today_tab = match app.current_screen {
@@ -45,15 +45,6 @@ pub fn ui(frame: &mut Frame, app: &App) {
     .block(Block::default().borders(Borders::ALL));
     frame.render_widget(today_tab, tab_chunks[0]);
 
-    let manage_tab = match app.current_screen {
-        CurrentScreen::Manage => {
-            Paragraph::new(Line::from("Manage").fg(Color::Black).bg(Color::LightYellow)).centered()
-        }
-        _ => Paragraph::new(Line::from("Manage")).centered(),
-    }
-    .block(Block::default().borders(Borders::ALL));
-    frame.render_widget(manage_tab, tab_chunks[1]);
-
     let stats_tab = match app.current_screen {
         CurrentScreen::Stats => {
             Paragraph::new(Line::from("Stats").fg(Color::Black).bg(Color::LightYellow)).centered()
@@ -61,7 +52,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
         _ => Paragraph::new(Line::from("Stats")).centered(),
     }
     .block(Block::default().borders(Borders::ALL));
-    frame.render_widget(stats_tab, tab_chunks[2]);
+    frame.render_widget(stats_tab, tab_chunks[1]);
 
     let body_chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -176,17 +167,6 @@ pub fn ui(frame: &mut Frame, app: &App) {
                     .centered(),
             );
             frame.render_widget(hint, inner_chunks[1]);
-        }
-        CurrentScreen::Manage => {
-            let hints = Paragraph::new(
-                Line::from(
-                    "[a] Add • [e] Edit • [d] Delete • [p] Pause/Resume • [↑↓]/[hjkl] Navigate",
-                )
-                .centered()
-                .fg(Color::Green),
-            )
-            .block(Block::default().borders(Borders::ALL));
-            frame.render_widget(hints, body_chunks[1]);
         }
         CurrentScreen::Stats => {
             let hints = Paragraph::new(
