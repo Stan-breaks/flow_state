@@ -19,8 +19,9 @@ fn create_main_layout(frame: &mut Frame) -> Rc<[Rect]> {
         ])
         .split(frame.area())
 }
-fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame) {
+fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame, app: &App) {
     render_title(chunks[0], frame);
+    render_tab(chunks[1], frame, app);
 }
 
 fn render_title(chunk: Rect, frame: &mut Frame) {
@@ -35,16 +36,11 @@ fn render_title(chunk: Rect, frame: &mut Frame) {
     let title = List::new(title_items).block(Block::default().borders(Borders::ALL));
     frame.render_widget(title, chunk);
 }
-
-pub fn ui(frame: &mut Frame, app: &App) {
-    // Create the layout sections.
-    let chunks = create_main_layout(frame);
-
-    render_main_ui(&chunks, frame);
+fn render_tab(chunk: Rect, frame: &mut Frame, app: &App) {
     let tab_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Min(1), Constraint::Min(1)])
-        .split(chunks[1]);
+        .split(chunk);
 
     let today_tab = match app.current_screen {
         CurrentScreen::Today => {
@@ -63,7 +59,13 @@ pub fn ui(frame: &mut Frame, app: &App) {
     }
     .block(Block::default().borders(Borders::ALL));
     frame.render_widget(stats_tab, tab_chunks[1]);
+}
 
+pub fn ui(frame: &mut Frame, app: &App) {
+    // Create the layout sections.
+    let chunks = create_main_layout(frame);
+
+    render_main_ui(&chunks, frame, app);
     let body_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([Constraint::Min(1), Constraint::Length(4)])
