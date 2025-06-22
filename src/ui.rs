@@ -5,7 +5,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style, Stylize},
     text::Line,
-    widgets::{Block, Borders, List, ListItem, Paragraph},
+    widgets::{Block, Borders, Clear, List, ListItem, Paragraph},
     Frame,
 };
 
@@ -211,25 +211,27 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
 
 fn render_float(frame: &mut Frame, area: Rect) {
     let block = Block::default().borders(Borders::ALL);
-    let popup_area = centered_rect(60, 25, area);
-    frame.render_widget(block, popup_area);
+    let paragraph = Paragraph::new("").block(block);
+    let popup_area = centered_rect(area);
+    frame.render_widget(Clear, popup_area);
+    frame.render_widget(paragraph, popup_area);
 }
 
-fn centered_rect(percent_x: u16, percent_y: u16, area: Rect) -> Rect {
+fn centered_rect(area: Rect) -> Rect {
     let popup_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Percentage((100 - percent_y) / 2),
-            Constraint::Percentage(percent_y),
-            Constraint::Percentage((100 - percent_y) / 2),
+            Constraint::Percentage((100 - 35) / 2),
+            Constraint::Percentage(35),
+            Constraint::Percentage((100 - 35) / 2),
         ])
         .split(area);
     Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
-            Constraint::Percentage((100 - percent_x) / 2),
-            Constraint::Percentage(percent_x),
-            Constraint::Percentage((100 - percent_x) / 2),
+            Constraint::Percentage((100 - 60) / 2),
+            Constraint::Percentage(60),
+            Constraint::Percentage((100 - 60) / 2),
         ])
         .split(popup_layout[1])[1]
 }
