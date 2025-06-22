@@ -1,4 +1,4 @@
-use std::{f32, rc::Rc};
+use std::rc::Rc;
 
 use crate::app::{App, CurrentScreen, ScreenMode};
 use ratatui::{
@@ -25,16 +25,16 @@ fn create_main_layout(frame: &mut Frame) -> Rc<[Rect]> {
         .split(frame.area())
 }
 fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame, app: &App) {
-    let area = frame.area();
-    match app.screen_mode {
-        ScreenMode::Editing => {
-            render_float(frame, area.height, area.width);
-        }
-        _ => {}
-    };
     render_title(chunks[0], frame);
     render_tab(chunks[1], frame, app);
     render_body(chunks[2], frame, app);
+    let area = frame.area();
+    match app.screen_mode {
+        ScreenMode::Editing => {
+            render_float(frame, area);
+        }
+        _ => {}
+    };
 }
 
 fn render_title(chunk: Rect, frame: &mut Frame) {
@@ -208,13 +208,28 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
         }
     }
 }
-fn render_float(frame: &mut Frame, height: u16, width: u16) {
-    let area = Rect::new(
-        (width as f32 * 0.25) as u16,
-        (height as f32 * 0.3) as u16,
-        width - (width as f32 * 0.5) as u16,
-        height - (height as f32 * 0.5) as u16,
-    );
-    let block = Block::new().borders(Borders::all());
-    frame.render_widget(block, area);
+
+fn render_float(frame: &mut Frame, area: Rect) {
+    let block = Block::default().borders(Borders::ALL);
+    let popup_area = centered_rect(60, 25, area);
+    frame.render_widget(block, popup_area);
+}
+
+fn centered_rect(percent_x: u16, percent_y: u16, area: Rect) -> Rect {
+    let popup_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage((100 - percent_y) / 2),
+            Constraint::Percentage(percent_y),
+            Constraint::Percentage((100 - percent_y) / 2),
+        ])
+        .split(area);
+    Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage((100 - percent_x) / 2),
+            Constraint::Percentage(percent_x),
+            Constraint::Percentage((100 - percent_x) / 2),
+        ])
+        .split(popup_layout[1])[1]
 }
