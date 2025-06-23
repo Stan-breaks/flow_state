@@ -33,7 +33,9 @@ fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame, app: &App) {
         ScreenMode::Adding => {
             add_float_render(frame, area);
         }
-        ScreenMode::Editing => {}
+        ScreenMode::Editing => {
+            edit_float_render(frame, area);
+        }
         _ => {}
     };
 }
