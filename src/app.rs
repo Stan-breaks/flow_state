@@ -272,6 +272,15 @@ impl App {
             _ => self.screen_mode = ScreenMode::Normal,
         }
     }
+    pub fn edit_build_habit(&mut self, index: usize) {
+        let current_habit = self.build_habits[index].clone();
+        self.build_habits.remove(index);
+        self.build_habits.push(Habit {
+            name: self.current_habit.name.clone(),
+            days_completed: current_habit.days_completed,
+            created: current_habit.created,
+        });
+    }
     pub fn add_build_habit(&mut self) {
         self.build_habits.push(self.current_habit.clone());
     }
