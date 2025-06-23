@@ -66,6 +66,12 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                     }
                     KeyCode::Char('a') => match app.screen_mode {
                         ScreenMode::Normal => {
+                            app.toggle_add_mode();
+                        }
+                        _ => {}
+                    },
+                    KeyCode::Char('e') => match app.screen_mode {
+                        ScreenMode::Normal => {
                             app.toggle_edit_mode();
                         }
                         _ => {}
