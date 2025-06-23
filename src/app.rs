@@ -272,6 +272,10 @@ impl App {
             _ => self.screen_mode = ScreenMode::Normal,
         }
     }
-    pub fn add_build_habit(&mut self) {}
-    pub fn add_avoid_habit(&mut self) {}
+    pub fn add_build_habit(&mut self) {
+        self.build_habits.push(self.current_habit.clone());
+    }
+    pub fn add_avoid_habit(&mut self) {
+        self.avoid_habits.push(self.current_habit.clone());
+    }
 }
