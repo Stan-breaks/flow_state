@@ -14,6 +14,7 @@ pub enum CurrentScreen {
 
 pub enum ScreenMode {
     Normal,
+    Adding,
     Editing,
 }
 
