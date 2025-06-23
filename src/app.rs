@@ -254,6 +254,12 @@ impl App {
             _ => {}
         }
     }
+    pub fn toggle_add_mode(&mut self) {
+        match self.screen_mode {
+            ScreenMode::Normal => self.screen_mode = ScreenMode::Adding,
+            _ => {}
+        }
+    }
     pub fn toggle_normal_mode(&mut self) {
         match self.screen_mode {
             ScreenMode::Normal => {}
