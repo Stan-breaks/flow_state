@@ -100,7 +100,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                         app.save_habits().unwrap();
                         break;
                     }
-                    ScreenMode::Editing => {
+                    _ => {
                         app.toggle_normal_mode();
                     }
                 },
