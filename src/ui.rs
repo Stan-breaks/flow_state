@@ -47,7 +47,7 @@ fn render_title(chunk: Rect, frame: &mut Frame) {
                 .style(Style::default().bold())
                 .centered(),
         ),
-        ListItem::new(Line::from("Progress Stats").centered()),
+        ListItem::new(Line::from("Minimalist Habit Tracker").centered()),
     ];
     let title = List::new(title_items).block(Block::default().borders(Borders::ALL));
     frame.render_widget(title, chunk);
