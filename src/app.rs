@@ -30,7 +30,7 @@ impl HabitStatus {
         }
     }
 }
-//some dumb comment
+
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct Completed {
     date: NaiveDate,
@@ -76,6 +76,7 @@ pub struct App {
     pub habits_counter: usize,
     pub current_screen: CurrentScreen,
     pub screen_mode: ScreenMode,
+    pub current_habit: Habit,
 }
 impl App {
     pub fn new() -> Self {
@@ -85,6 +86,11 @@ impl App {
             habits_counter: 0,
             current_screen: CurrentScreen::Today,
             screen_mode: ScreenMode::Normal,
+            current_habit: Habit {
+                name: String::default(),
+                days_completed: HashSet::default(),
+                created: NaiveDate::default(),
+            },
         }
     }
     pub fn toggle_page(&mut self) {
@@ -266,4 +272,6 @@ impl App {
             _ => self.screen_mode = ScreenMode::Normal,
         }
     }
+    pub fn add_build_habit(&mut self) {}
+    pub fn add_avoid_habit(&mut self) {}
 }
