@@ -30,8 +30,8 @@ fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame, app: &App) {
     render_body(chunks[2], frame, app);
     let area = frame.area();
     match app.screen_mode {
-        ScreenMode::Editing => {
-            render_float(frame, area);
+        ScreenMode::Adding => {
+            add_float_render(frame, area);
         }
         _ => {}
     };
@@ -209,8 +209,8 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
     }
 }
 
-fn render_float(frame: &mut Frame, area: Rect) {
-    let block = Block::default().borders(Borders::ALL);
+fn add_float_render(frame: &mut Frame, area: Rect) {
+    let block = Block::default().borders(Borders::ALL).title("Add habit");
     let paragraph = Paragraph::new("").block(block);
     let popup_area = centered_rect(area);
     frame.render_widget(Clear, popup_area);
