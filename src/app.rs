@@ -281,6 +281,15 @@ impl App {
             created: current_habit.created,
         });
     }
+    pub fn edit_avoid_habit(&mut self, index: usize) {
+        let current_habit = self.avoid_habits[index].clone();
+        self.avoid_habits.remove(index);
+        self.avoid_habits.push(Habit {
+            name: self.current_habit.name.clone(),
+            days_completed: current_habit.days_completed,
+            created: current_habit.created,
+        });
+    }
     pub fn add_build_habit(&mut self) {
         self.build_habits.push(self.current_habit.clone());
     }
