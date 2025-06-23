@@ -256,8 +256,8 @@ impl App {
     }
     pub fn toggle_normal_mode(&mut self) {
         match self.screen_mode {
-            ScreenMode::Editing => self.screen_mode = ScreenMode::Normal,
-            _ => {}
+            ScreenMode::Normal => {}
+            _ => self.screen_mode = ScreenMode::Normal,
         }
     }
 }
