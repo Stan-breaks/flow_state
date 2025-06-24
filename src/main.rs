@@ -58,12 +58,18 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                     KeyCode::Tab => {
                         app.toggle_page();
                     }
-                    KeyCode::Char('j') | KeyCode::Down => {
-                        app.increment_habits_counter();
-                    }
-                    KeyCode::Char('k') | KeyCode::Up => {
-                        app.decrement_habits_counter();
-                    }
+                    KeyCode::Char('j') | KeyCode::Down => match app.screen_mode {
+                        ScreenMode::Normal => {
+                            app.increment_habits_counter();
+                        }
+                        _ => {}
+                    },
+                    KeyCode::Char('k') | KeyCode::Up => match app.screen_mode {
+                        ScreenMode::Normal => {
+                            app.decrement_habits_counter();
+                        }
+                        _ => {}
+                    },
                     KeyCode::Char('a') => match app.screen_mode {
                         ScreenMode::Normal => {
                             app.toggle_add_mode();
