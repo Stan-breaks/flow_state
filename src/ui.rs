@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::app::{App, CurrentScreen, ScreenMode};
 use ratatui::{
-    layout::{Constraint, Direction, Layout, Rect},
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Style, Stylize},
     text::Line,
     widgets::{Block, Borders, Clear, List, ListItem, Paragraph},
@@ -213,12 +213,52 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
 }
 
 fn add_float_render(frame: &mut Frame, area: Rect) {
-    let block = Block::default().borders(Borders::ALL).title("Add habit");
-    let paragraph = Paragraph::new("").block(block);
     let popup_area = centered_rect(area);
-    frame.render_widget(Clear, popup_area);
-    frame.render_widget(paragraph, popup_area);
+    let popup_block = Block::default().borders(Borders::ALL).title("Add habit");
+    let inner_area = popup_block.inner(popup_area);
+    let main_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage(40), // Input section
+            Constraint::Percentage(30), // Type section
+            Constraint::Percentage(30), // Button section
+        ])
+        .split(inner_area);
+    let input_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(30), // Label
+            Constraint::Percentage(70), // Input field
+        ])
+        .split(main_chunks[0]);
+    let button_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(50), // Cancel button
+            Constraint::Percentage(50), // Submit button
+        ])
+        .split(main_chunks[2]);
+    let name_label = Paragraph::new("Name:");
+    let name_input = Paragraph::new("") // Your input text here
+        .block(Block::default().borders(Borders::ALL));
+
+    let cancel_button = Paragraph::new("Cancel")
+        .block(Block::default().borders(Borders::ALL))
+        .alignment(Alignment::Center);
+
+    let submit_button = Paragraph::new("Submit")
+        .block(Block::default().borders(Borders::ALL))
+        .alignment(Alignment::Center);
+
+    // 8. Render everything
+    frame.render_widget(Clear, popup_area); // Clear background
+    frame.render_widget(popup_block, popup_area); // Main bordered container
+    frame.render_widget(name_label, input_chunks[0]); // Label
+    frame.render_widget(name_input, input_chunks[1]); // Input
+    frame.render_widget(cancel_button, button_chunks[0]); // Cancel
+    frame.render_widget(submit_button, button_chunks[1]); // Submit
 }
+
 fn edit_float_render(frame: &mut Frame, area: Rect) {
     let block = Block::default().borders(Borders::ALL).title("Edit habit");
     let paragraph = Paragraph::new("").block(block);
