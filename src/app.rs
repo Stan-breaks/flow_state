@@ -245,7 +245,7 @@ impl App {
                 }
             }
         }
-        let progress = (counter as f32) / (total_possible as f32);
+        let progress = (counter as f32) / (total_possible as f32) * 100;
 
         format!(
             "{}  ({}/{})",
