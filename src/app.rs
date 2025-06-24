@@ -4,7 +4,7 @@ use std::{
     fs::{create_dir_all, read_to_string, write},
 };
 
-use chrono::{Datelike, Duration, NaiveDate, Utc, Weekday};
+use chrono::{Datelike, Duration, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 
 pub enum CurrentScreen {
