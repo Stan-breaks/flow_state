@@ -31,23 +31,17 @@ impl HabitStatus {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
-pub struct Completed {
-    date: NaiveDate,
-    day: Weekday,
-}
-
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Habit {
     pub name: String,
-    pub days_completed: HashSet<Completed>,
+    pub days_completed: HashSet<NaiveDate>,
     pub created: NaiveDate,
 }
 impl Habit {
     pub fn check_status(&self) -> HabitStatus {
         let today = Utc::now().date_naive();
         for i in self.days_completed.iter() {
-            if today == i.date {
+            if &today == i {
                 return HabitStatus::Complete;
             }
         }
@@ -55,10 +49,7 @@ impl Habit {
     }
     pub fn toggle_complete(&mut self) {
         let today = Utc::now();
-        let day_completed = Completed {
-            date: today.date_naive(),
-            day: today.weekday(),
-        };
+        let day_completed = today.date_naive();
         if !self.days_completed.insert(day_completed.clone()) {
             self.days_completed.remove(&day_completed);
         }
@@ -192,10 +183,7 @@ impl App {
         }
 
         let today = Utc::now();
-        let today = Completed {
-            date: today.date_naive(),
-            day: today.weekday(),
-        };
+        let today = today.date_naive();
 
         let mut counter = 0;
         for habit in self.build_habits.iter() {
@@ -218,34 +206,26 @@ impl App {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, 0);
         }
         let today = Utc::now();
-        let today = Completed {
-            date: today.date_naive(),
-            day: today.weekday(),
-        };
-        let day_since_monday = today.day.num_days_from_monday();
-        let week_start = today.date - Duration::days(day_since_monday as i64);
+        let date = today.date_naive();
+        let day_since_monday = today.weekday().num_days_from_monday();
+        let week_start = date - Duration::days(day_since_monday as i64);
 
         let total_possible = total_habits * 7;
         let mut counter = 0;
         for i in 0..7 {
             let check_date = week_start + Duration::days(i);
-            let check_datetime = check_date.and_hms_opt(0, 0, 0).unwrap();
-            let check_day = Completed {
-                date: check_date,
-                day: check_datetime.weekday(),
-            };
             for j in self.build_habits.iter() {
-                if j.days_completed.contains(&check_day) {
+                if j.days_completed.contains(&check_date) {
                     counter += 1
                 }
             }
             for j in self.avoid_habits.iter() {
-                if j.days_completed.contains(&check_day) {
+                if j.days_completed.contains(&check_date) {
                     counter += 1
                 }
             }
         }
-        let progress = (counter as f32) / (total_possible as f32) * 100;
+        let progress = (counter as f32) / (total_possible as f32) * 100 as f32;
 
         format!(
             "{}  ({}/{})",
