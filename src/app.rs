@@ -31,6 +31,11 @@ impl HabitStatus {
     }
 }
 
+pub enum HabitType {
+    Build,
+    Avoid,
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Habit {
     pub name: String,
