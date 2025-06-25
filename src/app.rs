@@ -195,17 +195,11 @@ impl App {
                 counter += 1;
             }
         }
-        for habit in self.avoid_habits.iter() {
-            if habit.days_completed.contains(&today) {
-                counter += 1;
-            }
-        }
-
         let progress = (counter as f32 / length as f32) * 100.0;
         format!("{}  ({}/{})", self.display_gauge(progress), counter, length)
     }
     pub fn check_weeks_progress(&self) -> String {
-        let total_habits = self.build_habits.len() + self.avoid_habits.len();
+        let total_habits = self.habits.len();
         if total_habits == 0 {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, 0);
         }
@@ -218,12 +212,7 @@ impl App {
         let mut counter = 0;
         for i in 0..7 {
             let check_date = week_start + Duration::days(i);
-            for j in self.build_habits.iter() {
-                if j.days_completed.contains(&check_date) {
-                    counter += 1
-                }
-            }
-            for j in self.avoid_habits.iter() {
+            for j in self.habits.iter() {
                 if j.days_completed.contains(&check_date) {
                     counter += 1
                 }
@@ -256,11 +245,12 @@ impl App {
             _ => self.screen_mode = ScreenMode::Normal,
         }
     }
-    pub fn edit_build_habit(&mut self, index: usize) {
-        let current_habit = self.build_habits[index].clone();
-        self.build_habits.remove(index);
-        self.build_habits.push(Habit {
+    pub fn edit_habit(&mut self, index: usize) {
+        let current_habit = self.habits[index].clone();
+        self.habits.remove(index);
+        self.habits.push(Habit {
             name: self.current_habit.name.clone(),
+            habit_type: self.current_habit.habit_type,
             days_completed: current_habit.days_completed,
             created: current_habit.created,
         });
