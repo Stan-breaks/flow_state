@@ -84,13 +84,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                             _ => {}
                         },
                         KeyCode::Enter => {
-                            let build_habit_len = app.build_habits.len();
-                            if app.habits_counter <= build_habit_len {
-                                app.build_habits[app.habits_counter - 1].toggle_complete();
-                            } else {
-                                app.avoid_habits[app.habits_counter - build_habit_len - 1]
-                                    .toggle_complete();
-                            }
+                            app.habits[app.habits_counter - 1].toggle_complete();
                         }
                         _ => {}
                     },
