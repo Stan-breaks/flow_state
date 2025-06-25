@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::app::{App, CurrentScreen, ScreenMode};
+use crate::app::{App, CurrentScreen, HabitType, ScreenMode};
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Style, Stylize},
@@ -91,7 +91,7 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
                 .split(body_chunks[0]);
 
             let build_habit = List::new(
-                app.build_habits
+                app.habits
                     .iter()
                     .enumerate()
                     .map(|(index, habit)| {
@@ -125,17 +125,17 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
                     .border_style(Style::default().fg(Color::Green)),
             );
             frame.render_widget(build_habit, habit_chucks[0]);
-            let build_habits_len = app.build_habits.len() + 1;
             let avoid_habit = List::new(
-                app.avoid_habits
+                app.habits
                     .iter()
+                    .filter(|habit| habit.habit_type == HabitType::Avoid)
                     .enumerate()
                     .map(|(index, habit)| {
-                        if index + build_habits_len == app.habits_counter {
+                        if index + 1 == app.habits_counter {
                             ListItem::new(format!(
                                 "{} [{}]. {}, {}  {}",
                                 habit.check_status().emoji(),
-                                index + build_habits_len,
+                                index + 1,
                                 habit.name,
                                 habit.created,
                                 habit.days_completed.len()
@@ -145,7 +145,7 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
                             ListItem::new(format!(
                                 "{} [{}]. {}, {}  {}",
                                 habit.check_status().emoji(),
-                                index + build_habits_len,
+                                index + 1,
                                 habit.name,
                                 habit.created,
                                 habit.days_completed.len()
