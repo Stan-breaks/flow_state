@@ -54,44 +54,56 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
             }
 
             match app.current_screen {
-                CurrentScreen::Today => match key.code {
-                    KeyCode::Tab => {
-                        app.toggle_page();
-                    }
-                    KeyCode::Char('j') | KeyCode::Down => match app.screen_mode {
-                        ScreenMode::Normal => {
-                            app.increment_habits_counter();
+                CurrentScreen::Today => match app.screen_mode {
+                    ScreenMode::Normal => match key.code {
+                        KeyCode::Tab => {
+                            app.toggle_page();
+                        }
+                        KeyCode::Char('j') | KeyCode::Down => match app.screen_mode {
+                            ScreenMode::Normal => {
+                                app.increment_habits_counter();
+                            }
+                            _ => {}
+                        },
+                        KeyCode::Char('k') | KeyCode::Up => match app.screen_mode {
+                            ScreenMode::Normal => {
+                                app.decrement_habits_counter();
+                            }
+                            _ => {}
+                        },
+                        KeyCode::Char('a') => match app.screen_mode {
+                            ScreenMode::Normal => {
+                                app.toggle_add_mode();
+                            }
+                            _ => {}
+                        },
+                        KeyCode::Char('e') => match app.screen_mode {
+                            ScreenMode::Normal => {
+                                app.toggle_edit_mode();
+                            }
+                            _ => {}
+                        },
+                        KeyCode::Enter => {
+                            let build_habit_len = app.build_habits.len();
+                            if app.habits_counter <= build_habit_len {
+                                app.build_habits[app.habits_counter - 1].toggle_complete();
+                            } else {
+                                app.avoid_habits[app.habits_counter - build_habit_len - 1]
+                                    .toggle_complete();
+                            }
                         }
                         _ => {}
                     },
-                    KeyCode::Char('k') | KeyCode::Up => match app.screen_mode {
-                        ScreenMode::Normal => {
-                            app.decrement_habits_counter();
+                    _ => match key.code {
+                        KeyCode::Backspace => {
+                            app.current_habit.name.pop();
+                        }
+                        KeyCode::Enter => {}
+                        KeyCode::Char(value) => {
+                            app.current_habit.name.push(value);
                         }
                         _ => {}
                     },
-                    KeyCode::Char('a') => match app.screen_mode {
-                        ScreenMode::Normal => {
-                            app.toggle_add_mode();
-                        }
-                        _ => {}
-                    },
-                    KeyCode::Char('e') => match app.screen_mode {
-                        ScreenMode::Normal => {
-                            app.toggle_edit_mode();
-                        }
-                        _ => {}
-                    },
-                    KeyCode::Enter => {
-                        let build_habit_len = app.build_habits.len();
-                        if app.habits_counter <= build_habit_len {
-                            app.build_habits[app.habits_counter - 1].toggle_complete();
-                        } else {
-                            app.avoid_habits[app.habits_counter - build_habit_len - 1]
-                                .toggle_complete();
-                        }
-                    }
-                    _ => {}
                 },
                 CurrentScreen::Stats => match key.code {
                     KeyCode::Tab => {
