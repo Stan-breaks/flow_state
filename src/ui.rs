@@ -221,7 +221,7 @@ fn add_float_render(frame: &mut Frame, area: Rect) {
         .constraints([
             Constraint::Percentage(40),
             Constraint::Percentage(30),
-            Constraint::Percentage(30),
+            Constraint::Percentage(20),
         ])
         .split(inner_area);
     let input_chunks = Layout::default()
@@ -235,11 +235,11 @@ fn add_float_render(frame: &mut Frame, area: Rect) {
     let name_label = Paragraph::new("Name:");
     let name_input = Paragraph::new("").block(Block::default().borders(Borders::ALL));
 
-    let cancel_button = Paragraph::new("Cancel")
+    let build_tab = Paragraph::new("Build Habit")
         .block(Block::default().borders(Borders::ALL))
         .alignment(Alignment::Center);
 
-    let submit_button = Paragraph::new("Submit")
+    let avoid_tab = Paragraph::new("Avoid Habit")
         .block(Block::default().borders(Borders::ALL))
         .alignment(Alignment::Center);
 
@@ -247,8 +247,8 @@ fn add_float_render(frame: &mut Frame, area: Rect) {
     frame.render_widget(popup_block, popup_area);
     frame.render_widget(name_label, input_chunks[0]);
     frame.render_widget(name_input, input_chunks[1]);
-    frame.render_widget(cancel_button, button_chunks[0]);
-    frame.render_widget(submit_button, button_chunks[1]);
+    frame.render_widget(build_tab, button_chunks[0]);
+    frame.render_widget(avoid_tab, button_chunks[1]);
 }
 
 fn edit_float_render(frame: &mut Frame, area: Rect) {
