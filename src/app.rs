@@ -31,7 +31,7 @@ impl HabitStatus {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub enum HabitType {
     Build,
     Avoid,
@@ -255,7 +255,6 @@ impl App {
             created: current_habit.created,
         });
     }
-
     pub fn add_habit(&mut self) {
         self.habits.push(self.current_habit.clone());
     }
