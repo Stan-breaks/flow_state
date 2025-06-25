@@ -31,6 +31,7 @@ impl HabitStatus {
     }
 }
 
+#[derive(Serialize, Deserialize, Clone)]
 pub enum HabitType {
     Build,
     Avoid,
@@ -39,6 +40,7 @@ pub enum HabitType {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Habit {
     pub name: String,
+    pub habit_type: HabitType,
     pub days_completed: HashSet<NaiveDate>,
     pub created: NaiveDate,
 }
@@ -63,12 +65,10 @@ impl Habit {
 
 #[derive(Serialize, Deserialize, Clone)]
 struct HabitsData {
-    build_habits: Vec<Habit>,
-    avoid_habits: Vec<Habit>,
+    habits: Vec<Habit>,
 }
 pub struct App {
-    pub build_habits: Vec<Habit>,
-    pub avoid_habits: Vec<Habit>,
+    pub habits: Vec<Habit>,
     pub habits_counter: usize,
     pub current_screen: CurrentScreen,
     pub screen_mode: ScreenMode,
@@ -77,13 +77,13 @@ pub struct App {
 impl App {
     pub fn new() -> Self {
         App {
-            build_habits: Vec::default(),
-            avoid_habits: Vec::default(),
+            habits: Vec::default(),
             habits_counter: 0,
             current_screen: CurrentScreen::Today,
             screen_mode: ScreenMode::Normal,
             current_habit: Habit {
                 name: String::default(),
+                habit_type: HabitType::Build,
                 days_completed: HashSet::default(),
                 created: NaiveDate::default(),
             },
@@ -100,8 +100,7 @@ impl App {
             .ok_or("Could not find config directory")?
             .join("flow_state");
         let habits_data = HabitsData {
-            build_habits: self.build_habits.clone(),
-            avoid_habits: self.avoid_habits.clone(),
+            habits: self.habits.clone(),
         };
         let toml_string = toml::to_string(&habits_data)?;
         write(config_dir.join("habits.toml"), toml_string)?;
@@ -119,42 +118,42 @@ impl App {
         if habits_file.exists() {
             let content = read_to_string(habits_file)?;
             let habits_data: HabitsData = toml::from_str(&content)?;
-            self.build_habits = habits_data.build_habits;
-            self.avoid_habits = habits_data.avoid_habits;
+            self.habits = habits_data.habits;
         } else {
             self.populate_dummy_data();
         }
         Ok(())
     }
     fn populate_dummy_data(&mut self) {
-        self.build_habits = vec![
+        self.habits = vec![
             Habit {
                 name: "Morning run".to_string(),
+                habit_type: HabitType::Build,
                 days_completed: HashSet::new(),
                 created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
             Habit {
                 name: "Read 10 pages".to_string(),
+                habit_type: HabitType::Build,
                 days_completed: HashSet::new(),
                 created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
-        ];
-
-        self.avoid_habits = vec![
             Habit {
                 name: "Social media scrolling".to_string(),
+                habit_type: HabitType::Avoid,
                 days_completed: HashSet::new(),
                 created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
             Habit {
                 name: "Late-night snacking".to_string(),
+                habit_type: HabitType::Avoid,
                 days_completed: HashSet::new(),
                 created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
         ];
     }
     pub fn increment_habits_counter(&mut self) {
-        if self.habits_counter < self.avoid_habits.len() + self.build_habits.len() {
+        if self.habits_counter < self.habits.len() {
             self.habits_counter += 1;
         }
     }
@@ -182,7 +181,7 @@ impl App {
         format!("{} {:.1}%", segments[index], progress,)
     }
     pub fn check_todays_progress(&self) -> String {
-        let length = self.build_habits.len() + self.avoid_habits.len();
+        let length = self.habits.len();
         if length == 0 {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, length);
         }
@@ -191,7 +190,7 @@ impl App {
         let today = today.date_naive();
 
         let mut counter = 0;
-        for habit in self.build_habits.iter() {
+        for habit in self.habits.iter() {
             if habit.days_completed.contains(&today) {
                 counter += 1;
             }
