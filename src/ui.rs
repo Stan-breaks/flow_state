@@ -31,10 +31,10 @@ fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame, app: &App) {
     let area = frame.area();
     match app.screen_mode {
         ScreenMode::Adding => {
-            add_float_render(frame, area);
+            add_float_render(frame, area, app);
         }
         ScreenMode::Editing => {
-            edit_float_render(frame, area);
+            edit_float_render(frame, area, app);
         }
         _ => {}
     };
@@ -212,7 +212,7 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
     }
 }
 
-fn add_float_render(frame: &mut Frame, area: Rect) {
+fn add_float_render(frame: &mut Frame, area: Rect, app: &App) {
     let popup_area = centered_rect(area);
     let popup_block = Block::default().borders(Borders::ALL).title("Add habit");
     let inner_area = popup_block.inner(popup_area);
@@ -233,7 +233,8 @@ fn add_float_render(frame: &mut Frame, area: Rect) {
         .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
         .split(main_chunks[2]);
     let name_label = Paragraph::new("Name:");
-    let name_input = Paragraph::new("").block(Block::default().borders(Borders::ALL));
+    let name_input = Paragraph::new(format!("{}", app.current_habit.name))
+        .block(Block::default().borders(Borders::ALL));
 
     let build_tab = Paragraph::new("Build Habit")
         .block(Block::default().borders(Borders::ALL))
@@ -251,7 +252,7 @@ fn add_float_render(frame: &mut Frame, area: Rect) {
     frame.render_widget(avoid_tab, button_chunks[1]);
 }
 
-fn edit_float_render(frame: &mut Frame, area: Rect) {
+fn edit_float_render(frame: &mut Frame, area: Rect, app: &App) {
     let block = Block::default().borders(Borders::ALL).title("Edit habit");
     let paragraph = Paragraph::new("").block(block);
     let popup_area = centered_rect(area);
