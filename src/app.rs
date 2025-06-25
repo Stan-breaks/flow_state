@@ -245,6 +245,12 @@ impl App {
             _ => self.screen_mode = ScreenMode::Normal,
         }
     }
+    pub fn toggle_habit_type(&mut self) {
+        match self.current_habit.habit_type {
+            HabitType::Build => self.current_habit.habit_type = HabitType::Avoid,
+            HabitType::Avoid => self.current_habit.habit_type = HabitType::Build,
+        }
+    }
     pub fn edit_habit(&mut self, index: usize) {
         let current_habit = self.habits[index].clone();
         self.habits.remove(index);
