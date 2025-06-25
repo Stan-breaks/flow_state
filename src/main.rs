@@ -88,7 +88,23 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                         }
                         _ => {}
                     },
-                    _ => match key.code {
+                    ScreenMode::Adding => match key.code {
+                        KeyCode::Tab => {
+                            app.toggle_habit_type();
+                        }
+                        KeyCode::Backspace => {
+                            app.current_habit.name.pop();
+                        }
+                        KeyCode::Enter => {}
+                        KeyCode::Char(value) => {
+                            app.current_habit.name.push(value);
+                        }
+                        _ => {}
+                    },
+                    ScreenMode::Editing => match key.code {
+                        KeyCode::Tab => {
+                            app.toggle_habit_type();
+                        }
                         KeyCode::Backspace => {
                             app.current_habit.name.pop();
                         }
