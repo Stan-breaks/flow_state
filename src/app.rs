@@ -250,7 +250,7 @@ impl App {
         self.habits.remove(index);
         self.habits.push(Habit {
             name: self.current_habit.name.clone(),
-            habit_type: self.current_habit.habit_type,
+            habit_type: self.current_habit.habit_type.clone(),
             days_completed: current_habit.days_completed,
             created: current_habit.created,
         });
