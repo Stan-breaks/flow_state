@@ -239,14 +239,31 @@ fn add_float_render(frame: &mut Frame, area: Rect, app: &App) {
     let name_input = Paragraph::new(format!("{}", app.current_habit.name))
         .block(Block::default().borders(Borders::ALL));
 
-    let build_tab = Paragraph::new("Build Habit")
+    let build_tab = match app.current_habit.habit_type {
+        HabitType::Build => Paragraph::new(
+            Line::from("Build Habit")
+                .bg(Color::LightYellow)
+                .fg(Color::Black),
+        )
         .block(Block::default().borders(Borders::ALL))
-        .alignment(Alignment::Center);
+        .alignment(Alignment::Center),
+        HabitType::Avoid => Paragraph::new("Build Habit")
+            .block(Block::default().borders(Borders::ALL))
+            .alignment(Alignment::Center),
+    };
 
-    let avoid_tab = Paragraph::new("Avoid Habit")
+    let avoid_tab = match app.current_habit.habit_type {
+        HabitType::Build => Paragraph::new("Avoid Habit")
+            .block(Block::default().borders(Borders::ALL))
+            .alignment(Alignment::Center),
+        HabitType::Avoid => Paragraph::new(
+            Line::from("Avoid Habit")
+                .bg(Color::LightYellow)
+                .fg(Color::Black),
+        )
         .block(Block::default().borders(Borders::ALL))
-        .alignment(Alignment::Center);
-
+        .alignment(Alignment::Center),
+    };
     frame.render_widget(Clear, popup_area);
     frame.render_widget(popup_block, popup_area);
     frame.render_widget(name_label, input_chunks[0]);
