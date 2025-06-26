@@ -12,6 +12,7 @@ pub enum CurrentScreen {
     Stats,
 }
 pub struct Counter {
+    pub index: usize,
     pub build_counter: usize,
     pub avoid_counter: usize,
     pub switch: bool,
@@ -84,6 +85,7 @@ impl App {
         App {
             habits: Vec::default(),
             counter: Counter {
+                index: 0,
                 build_counter: 0,
                 avoid_counter: 0,
                 switch: false,
@@ -179,6 +181,7 @@ impl App {
         if self.counter.switch && self.counter.avoid_counter < avoid_len {
             self.counter.avoid_counter += 1;
         }
+        self.counter.index += 1;
     }
     pub fn decrement_habits_counter(&mut self) {
         let build_len = self
@@ -197,6 +200,7 @@ impl App {
         if !self.counter.switch && self.counter.build_counter > 0 {
             self.counter.build_counter -= 1;
         }
+        self.counter.index -= 1;
     }
     fn display_gauge(&self, progress: f32) -> String {
         let segments = [
