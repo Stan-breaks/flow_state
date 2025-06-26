@@ -300,5 +300,6 @@ impl App {
     pub fn add_habit(&mut self) {
         self.current_habit.created = Utc::now().date_naive();
         self.habits.push(self.current_habit.clone());
+        self.toggle_normal_mode();
     }
 }
