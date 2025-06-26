@@ -181,11 +181,18 @@ impl App {
         }
     }
     pub fn decrement_habits_counter(&mut self) {
+        let build_len = self
+            .habits
+            .iter()
+            .filter(|habit| habit.habit_type == HabitType::Build)
+            .collect::<Vec<&Habit>>()
+            .len();
         if self.counter.switch && self.counter.avoid_counter > 0 {
-            self.counter.build_counter -= 1;
+            self.counter.avoid_counter -= 1;
         }
-        if self.counter.avoid_counter == 0 {
+        if self.counter.switch && self.counter.avoid_counter == 0 {
             self.counter.switch = false;
+            self.counter.build_counter = build_len + 1;
         }
         if !self.counter.switch && self.counter.build_counter > 0 {
             self.counter.build_counter -= 1;
