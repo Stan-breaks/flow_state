@@ -84,7 +84,12 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                             _ => {}
                         },
                         KeyCode::Enter => {
-                            app.habits[app.counter.build_counter - 1].toggle_complete();
+                            if !app.counter.switch && app.counter.build_counter > 0 {
+                                app.habits[app.counter.index - 1].toggle_complete();
+                            }
+                            if app.counter.switch && app.counter.avoid_counter > 0 {
+                                app.habits[app.counter.index - 1].toggle_complete();
+                            }
                         }
                         _ => {}
                     },
