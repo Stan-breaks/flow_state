@@ -11,6 +11,11 @@ pub enum CurrentScreen {
     Today,
     Stats,
 }
+pub struct Counter {
+    pub build_counter: usize,
+    pub avoid_counter: usize,
+    pub switch: bool,
+}
 
 pub enum ScreenMode {
     Normal,
@@ -69,7 +74,7 @@ struct HabitsData {
 }
 pub struct App {
     pub habits: Vec<Habit>,
-    pub habits_counter: usize,
+    pub counter: Counter,
     pub current_screen: CurrentScreen,
     pub screen_mode: ScreenMode,
     pub current_habit: Habit,
@@ -78,7 +83,11 @@ impl App {
     pub fn new() -> Self {
         App {
             habits: Vec::default(),
-            habits_counter: 0,
+            counter: Counter {
+                build_counter: 0,
+                avoid_counter: 0,
+                switch: false,
+            },
             current_screen: CurrentScreen::Today,
             screen_mode: ScreenMode::Normal,
             current_habit: Habit {
@@ -153,13 +162,33 @@ impl App {
         ];
     }
     pub fn increment_habits_counter(&mut self) {
-        if self.habits_counter < self.habits.len() {
-            self.habits_counter += 1;
+        let build_len = self
+            .habits
+            .iter()
+            .filter(|habit| habit.habit_type == HabitType::Build)
+            .collect::<Vec<&Habit>>()
+            .len();
+        let avoid_len = self.habits.len() - build_len;
+        if !self.counter.switch && self.counter.build_counter <= build_len {
+            self.counter.build_counter += 1;
+        }
+        if !self.counter.switch && self.counter.build_counter == build_len + 1 {
+            self.counter.switch = true;
+            self.counter.build_counter = 0;
+        }
+        if self.counter.switch && self.counter.avoid_counter < avoid_len {
+            self.counter.avoid_counter += 1;
         }
     }
     pub fn decrement_habits_counter(&mut self) {
-        if self.habits_counter > 0 {
-            self.habits_counter -= 1;
+        if self.counter.switch && self.counter.avoid_counter > 0 {
+            self.counter.build_counter -= 1;
+        }
+        if self.counter.avoid_counter == 0 {
+            self.counter.switch = false;
+        }
+        if !self.counter.switch && self.counter.build_counter > 0 {
+            self.counter.build_counter -= 1;
         }
     }
     fn display_gauge(&self, progress: f32) -> String {
@@ -262,6 +291,7 @@ impl App {
         });
     }
     pub fn add_habit(&mut self) {
+        self.current_habit.created = Utc::now().date_naive();
         self.habits.push(self.current_habit.clone());
     }
 }
