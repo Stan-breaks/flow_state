@@ -96,12 +96,12 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
                     .enumerate()
                     .filter(|(_, habit)| habit.habit_type == HabitType::Build)
                     .enumerate()
-                    .map(|(_, (original_idx, habit))| {
-                        if original_idx + 1 == app.habits_counter {
+                    .map(|(display_idx, (_, habit))| {
+                        if display_idx + 1 == app.counter.build_counter {
                             ListItem::new(format!(
                                 "{} [{}]. {}, {}  {}",
                                 habit.check_status().emoji(),
-                                original_idx + 1,
+                                display_idx + 1,
                                 habit.name,
                                 habit.created,
                                 habit.days_completed.len()
@@ -111,7 +111,7 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
                             ListItem::new(format!(
                                 "{} [{}]. {}, {}  {}",
                                 habit.check_status().emoji(),
-                                original_idx + 1,
+                                display_idx + 1,
                                 habit.name,
                                 habit.created,
                                 habit.days_completed.len()
@@ -133,12 +133,12 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
                     .enumerate()
                     .filter(|(_, habit)| habit.habit_type == HabitType::Avoid)
                     .enumerate()
-                    .map(|(_, (original_idx, habit))| {
-                        if original_idx + 1 == app.habits_counter {
+                    .map(|(display_idx, (_, habit))| {
+                        if display_idx + 1 == app.counter.avoid_counter {
                             ListItem::new(format!(
                                 "{} [{}]. {}, {}  {}",
                                 habit.check_status().emoji(),
-                                original_idx + 1,
+                                display_idx + 1,
                                 habit.name,
                                 habit.created,
                                 habit.days_completed.len()
@@ -148,7 +148,7 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
                             ListItem::new(format!(
                                 "{} [{}]. {}, {}  {}",
                                 habit.check_status().emoji(),
-                                original_idx + 1,
+                                display_idx + 1,
                                 habit.name,
                                 habit.created,
                                 habit.days_completed.len()
