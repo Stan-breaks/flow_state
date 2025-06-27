@@ -43,7 +43,7 @@ pub enum HabitType {
     Avoid,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, PartialEq)]
 pub struct Habit {
     pub name: String,
     pub habit_type: HabitType,
