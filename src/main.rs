@@ -13,7 +13,7 @@ use ratatui::{
 mod app;
 mod ui;
 use crate::{
-    app::{App, CurrentScreen, ScreenMode},
+    app::{App, CurrentScreen, Habit, HabitType, ScreenMode},
     ui::ui,
 };
 
@@ -85,10 +85,38 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                         },
                         KeyCode::Enter => {
                             if !app.counter.switch && app.counter.build_counter > 0 {
-                                app.habits[app.counter.index - 1].toggle_complete();
+                                let build_habit = app
+                                    .habits
+                                    .iter()
+                                    .filter(|habit| habit.habit_type == HabitType::Build)
+                                    .collect::<Vec<&Habit>>()[app.counter.build_counter - 1];
+                                let mut index = 0;
+                                for i in 0..app.habits.len() {
+                                    if &app.habits[i] == build_habit {
+                                        index = i;
+                                        break;
+                                    }
+                                }
+                                if index != 0 {
+                                    app.habits[index].toggle_complete();
+                                }
                             }
                             if app.counter.switch && app.counter.avoid_counter > 0 {
-                                app.habits[app.counter.index - 1].toggle_complete();
+                                let avoid_habit = app
+                                    .habits
+                                    .iter()
+                                    .filter(|habit| habit.habit_type == HabitType::Avoid)
+                                    .collect::<Vec<&Habit>>()[app.counter.build_counter - 1];
+                                let mut index = 0;
+                                for i in 0..app.habits.len() {
+                                    if &app.habits[i] == avoid_habit {
+                                        index = i;
+                                        break;
+                                    }
+                                }
+                                if index != 0 {
+                                    app.habits[index].toggle_complete();
+                                }
                             }
                         }
                         _ => {}
