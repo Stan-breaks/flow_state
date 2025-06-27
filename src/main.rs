@@ -97,16 +97,14 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                                         break;
                                     }
                                 }
-                                if index != 0 {
-                                    app.habits[index].toggle_complete();
-                                }
+                                app.habits[index].toggle_complete();
                             }
                             if app.counter.switch && app.counter.avoid_counter > 0 {
                                 let avoid_habit = app
                                     .habits
                                     .iter()
                                     .filter(|habit| habit.habit_type == HabitType::Avoid)
-                                    .collect::<Vec<&Habit>>()[app.counter.build_counter - 1];
+                                    .collect::<Vec<&Habit>>()[app.counter.avoid_counter - 1];
                                 let mut index = 0;
                                 for i in 0..app.habits.len() {
                                     if &app.habits[i] == avoid_habit {
@@ -114,9 +112,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                                         break;
                                     }
                                 }
-                                if index != 0 {
-                                    app.habits[index].toggle_complete();
-                                }
+                                app.habits[index].toggle_complete();
                             }
                         }
                         _ => {}
