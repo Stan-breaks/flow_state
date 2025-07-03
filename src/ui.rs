@@ -264,6 +264,7 @@ fn add_float_render(frame: &mut Frame, area: Rect, app: &App) {
         .block(Block::default().borders(Borders::ALL))
         .alignment(Alignment::Center),
     };
+
     frame.render_widget(Clear, popup_area);
     frame.render_widget(popup_block, popup_area);
     frame.render_widget(name_label, input_chunks[0]);
