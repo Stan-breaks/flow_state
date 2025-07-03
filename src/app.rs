@@ -306,6 +306,7 @@ impl App {
         self.habits.push(self.current_habit.clone());
         self.current_habit.name = String::default();
         self.current_habit.habit_type = HabitType::Build;
+        self.current_habit.days_completed = HashSet::default();
         self.toggle_normal_mode();
     }
 }
