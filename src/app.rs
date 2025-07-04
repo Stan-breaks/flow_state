@@ -267,9 +267,12 @@ impl App {
             total_possible
         )
     }
-    pub fn toggle_edit_mode(&mut self) {
+    pub fn toggle_edit_mode(&mut self, habit: Habit) {
         match self.screen_mode {
-            ScreenMode::Normal => self.screen_mode = ScreenMode::Editing,
+            ScreenMode::Normal => {
+                self.screen_mode = ScreenMode::Editing;
+                self.current_habit = habit;
+            }
             _ => {}
         }
     }
@@ -292,14 +295,9 @@ impl App {
         }
     }
     pub fn edit_habit(&mut self, index: usize) {
-        let current_habit = self.habits[index].clone();
-        self.habits.remove(index);
-        self.habits.push(Habit {
-            name: self.current_habit.name.clone(),
-            habit_type: self.current_habit.habit_type.clone(),
-            days_completed: current_habit.days_completed,
-            created: current_habit.created,
-        });
+        self.habits[index].name = self.current_habit.name.clone();
+        self.habits[index].habit_type = self.current_habit.habit_type.clone();
+        self.toggle_normal_mode();
     }
     pub fn add_habit(&mut self) {
         self.current_habit.created = Utc::now().date_naive();
