@@ -281,11 +281,68 @@ fn add_float_render(frame: &mut Frame, area: Rect, app: &App) {
 }
 
 fn edit_float_render(frame: &mut Frame, area: Rect, app: &App) {
-    let block = Block::default().borders(Borders::ALL).title("Edit habit");
-    let paragraph = Paragraph::new("").block(block);
     let popup_area = centered_rect(area);
+    let popup_block = Block::default().borders(Borders::ALL).title("Edit habit");
+    let inner_area = popup_block.inner(popup_area);
+    let main_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage(40),
+            Constraint::Percentage(30),
+            Constraint::Percentage(20),
+        ])
+        .split(inner_area);
+    let input_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Percentage(30), Constraint::Percentage(70)])
+        .split(main_chunks[0]);
+    let button_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+        .split(main_chunks[2]);
+    let name_label = Paragraph::new("Name:");
+    let name_input = Paragraph::new(format!("{}", app.current_habit.name))
+        .block(Block::default().borders(Borders::ALL));
+
+    let build_tab = match app.current_habit.habit_type {
+        HabitType::Build => Paragraph::new(
+            Line::from("Build Habit")
+                .bg(Color::LightYellow)
+                .fg(Color::Black),
+        )
+        .block(Block::default().borders(Borders::ALL))
+        .alignment(Alignment::Center),
+        HabitType::Avoid => Paragraph::new("Build Habit")
+            .block(Block::default().borders(Borders::ALL))
+            .alignment(Alignment::Center),
+    };
+
+    let avoid_tab = match app.current_habit.habit_type {
+        HabitType::Build => Paragraph::new("Avoid Habit")
+            .block(Block::default().borders(Borders::ALL))
+            .alignment(Alignment::Center),
+        HabitType::Avoid => Paragraph::new(
+            Line::from("Avoid Habit")
+                .bg(Color::LightYellow)
+                .fg(Color::Black),
+        )
+        .block(Block::default().borders(Borders::ALL))
+        .alignment(Alignment::Center),
+    };
+
     frame.render_widget(Clear, popup_area);
-    frame.render_widget(paragraph, popup_area);
+    frame.render_widget(popup_block, popup_area);
+    frame.render_widget(name_label, input_chunks[0]);
+    frame.render_widget(name_input, input_chunks[1]);
+    frame.render_widget(build_tab, button_chunks[0]);
+    frame.render_widget(avoid_tab, button_chunks[1]);
+
+    let x_offset = app.current_habit.name.len() as u16;
+    let input_area = input_chunks[1];
+    let cursor_x = input_area.x + x_offset + 1;
+    let cursor_y = input_area.y + 1;
+    let postion = Position::new(cursor_x, cursor_y);
+    frame.set_cursor_position(postion);
 }
 
 fn centered_rect(area: Rect) -> Rect {
