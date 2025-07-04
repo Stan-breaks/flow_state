@@ -22,6 +22,7 @@ pub enum ScreenMode {
     Normal,
     Adding,
     Editing,
+    Deleting,
 }
 
 pub enum HabitStatus {
@@ -286,6 +287,12 @@ impl App {
         match self.screen_mode {
             ScreenMode::Normal => {}
             _ => self.screen_mode = ScreenMode::Normal,
+        }
+    }
+    pub fn toggle_delete_mode(&mut self) {
+        match self.screen_mode {
+            ScreenMode::Deleting => {}
+            _ => self.screen_mode = ScreenMode::Deleting,
         }
     }
     pub fn toggle_habit_type(&mut self) {
