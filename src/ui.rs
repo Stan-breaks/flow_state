@@ -400,9 +400,9 @@ fn centered_rect(area: Rect) -> Rect {
     let popup_layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Percentage((100 - 35) / 2),
-            Constraint::Percentage(35),
-            Constraint::Percentage((100 - 35) / 2),
+            Constraint::Percentage((100 - 40) / 2),
+            Constraint::Percentage(40),
+            Constraint::Percentage((100 - 40) / 2),
         ])
         .split(area);
     Layout::default()
