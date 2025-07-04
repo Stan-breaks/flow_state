@@ -102,22 +102,20 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
                     .map(|(display_idx, (_, habit))| {
                         if display_idx + 1 == app.counter.build_counter {
                             ListItem::new(format!(
-                                "{} [{}]. {}, {}  {}",
+                                "{} [{}] {}  •  {}",
                                 habit.check_status().emoji(),
                                 display_idx + 1,
                                 habit.name,
-                                habit.created,
-                                habit.days_completed.len()
+                                habit.check_pattern().string()
                             ))
                             .bg(Color::Green)
                         } else {
                             ListItem::new(format!(
-                                "{} [{}]. {}, {}  {}",
+                                "{} [{}] {}  •  {}",
                                 habit.check_status().emoji(),
                                 display_idx + 1,
                                 habit.name,
-                                habit.created,
-                                habit.days_completed.len()
+                                habit.check_pattern().string()
                             ))
                         }
                     })
@@ -139,22 +137,20 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
                     .map(|(display_idx, (_, habit))| {
                         if display_idx + 1 == app.counter.avoid_counter {
                             ListItem::new(format!(
-                                "{} [{}]. {}, {}  {}",
+                                "{} [{}] {}  •  {}",
                                 habit.check_status().emoji(),
                                 display_idx + 1,
                                 habit.name,
-                                habit.created,
-                                habit.days_completed.len()
+                                habit.check_pattern().string()
                             ))
                             .bg(Color::Red)
                         } else {
                             ListItem::new(format!(
-                                "{} [{}]. {}, {}  {}",
+                                "{} [{}] {}  •  {}",
                                 habit.check_status().emoji(),
                                 display_idx + 1,
                                 habit.name,
-                                habit.created,
-                                habit.days_completed.len()
+                                habit.check_pattern().string()
                             ))
                         }
                     })
