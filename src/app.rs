@@ -86,6 +86,23 @@ impl Habit {
             self.days_completed.remove(&day_completed);
         }
     }
+    pub fn check_pattern(&self) -> HabitPattern {
+        let days_since_creation = Utc::now()
+            .date_naive()
+            .signed_duration_since(self.created)
+            .num_days();
+        let check_ins = self.days_completed.len();
+        let pattern = ((check_ins as f32 / days_since_creation as f32 * 5 as f32).round() as u32)
+            .min(1)
+            .max(5);
+        match pattern {
+            2 => HabitPattern::Struggling,
+            3 => HabitPattern::Developing,
+            4 => HabitPattern::Established,
+            5 => HabitPattern::Mastered,
+            _ => HabitPattern::Chaotic,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
