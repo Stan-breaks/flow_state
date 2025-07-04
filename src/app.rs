@@ -286,13 +286,53 @@ impl App {
     pub fn toggle_normal_mode(&mut self) {
         match self.screen_mode {
             ScreenMode::Normal => {}
-            _ => self.screen_mode = ScreenMode::Normal,
+            _ => {
+                self.screen_mode = ScreenMode::Normal;
+                self.current_habit = Habit {
+                    name: String::default(),
+                    habit_type: HabitType::Build,
+                    days_completed: HashSet::default(),
+                    created: NaiveDate::default(),
+                }
+            }
         }
     }
     pub fn toggle_delete_mode(&mut self) {
         match self.screen_mode {
             ScreenMode::Deleting => {}
-            _ => self.screen_mode = ScreenMode::Deleting,
+            _ => {
+                self.screen_mode = ScreenMode::Deleting;
+                if !self.counter.switch && self.counter.build_counter > 0 {
+                    let build_habit = self
+                        .habits
+                        .iter()
+                        .filter(|habit| habit.habit_type == HabitType::Build)
+                        .collect::<Vec<&Habit>>()[self.counter.build_counter - 1];
+                    let mut index = 0;
+                    for i in 0..self.habits.len() {
+                        if &self.habits[i] == build_habit {
+                            index = i;
+                            break;
+                        }
+                    }
+                    self.current_habit = self.habits[index].clone();
+                }
+                if self.counter.switch && self.counter.avoid_counter > 0 {
+                    let avoid_habit = self
+                        .habits
+                        .iter()
+                        .filter(|habit| habit.habit_type == HabitType::Avoid)
+                        .collect::<Vec<&Habit>>()[self.counter.avoid_counter - 1];
+                    let mut index = 0;
+                    for i in 0..self.habits.len() {
+                        if &self.habits[i] == avoid_habit {
+                            index = i;
+                            break;
+                        }
+                    }
+                    self.current_habit = self.habits[index].clone();
+                }
+            }
         }
     }
     pub fn toggle_habit_type(&mut self) {
@@ -309,9 +349,6 @@ impl App {
     pub fn add_habit(&mut self) {
         self.current_habit.created = Utc::now().date_naive();
         self.habits.push(self.current_habit.clone());
-        self.current_habit.name = String::default();
-        self.current_habit.habit_type = HabitType::Build;
-        self.current_habit.days_completed = HashSet::default();
         self.toggle_normal_mode();
     }
 }
