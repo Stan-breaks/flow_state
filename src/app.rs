@@ -90,11 +90,12 @@ impl Habit {
         let days_since_creation = Utc::now()
             .date_naive()
             .signed_duration_since(self.created)
-            .num_days();
+            .num_days()
+            .max(1);
         let check_ins = self.days_completed.len();
-        let pattern = ((check_ins as f32 / days_since_creation as f32 * 5 as f32).round() as u32)
-            .min(1)
-            .max(5);
+        let pattern = ((check_ins as f32 / days_since_creation as f32 * 5.0).round() as u32)
+            .max(1)
+            .min(5);
         match pattern {
             2 => HabitPattern::Struggling,
             3 => HabitPattern::Developing,
