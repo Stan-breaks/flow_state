@@ -205,7 +205,7 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
         }
         CurrentScreen::Stats => {
             let hints = Paragraph::new(
-                Line::from("[P] Bulk pause • [↑↓]/[hjkl] Navigate")
+                Line::from("[P] Bulk pause • [↑↓]/[jk] Navigate")
                     .fg(Color::Green)
                     .centered(),
             )
