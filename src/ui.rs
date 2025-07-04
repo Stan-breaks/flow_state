@@ -36,6 +36,9 @@ fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame, app: &App) {
         ScreenMode::Editing => {
             edit_float_render(frame, area, app);
         }
+        ScreenMode::Deleting => {
+            delete_float(frame, area);
+        }
         _ => {}
     };
 }
@@ -348,7 +351,7 @@ fn edit_float_render(frame: &mut Frame, area: Rect, app: &App) {
 fn delete_float(frame: &mut Frame, area: Rect) {
     let popup_block = Block::default().borders(Borders::ALL);
     let popup_area = centered_rect(area);
-    let popup_area = popup_block.inner(popup_area);
+    let inner_area = popup_block.inner(popup_area);
 
     let main_chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -357,9 +360,16 @@ fn delete_float(frame: &mut Frame, area: Rect) {
             Constraint::Percentage(35),
             Constraint::Percentage(20),
         ])
-        .split(popup_area);
+        .split(inner_area);
 
     let msg = Paragraph::new("Confirm delete").fg(Color::Red);
+
+    let choices = Paragraph::new("y/n").fg(Color::White);
+
+    frame.render_widget(Clear, popup_area);
+    frame.render_widget(popup_block, popup_area);
+    frame.render_widget(msg, main_chunks[0]);
+    frame.render_widget(choices, main_chunks[1]);
 }
 
 fn centered_rect(area: Rect) -> Rect {
