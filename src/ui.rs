@@ -37,7 +37,7 @@ fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame, app: &App) {
             edit_float_render(frame, area, app);
         }
         ScreenMode::Deleting => {
-            delete_float(frame, area);
+            delete_float(frame, area, app);
         }
         _ => {}
     };
@@ -348,9 +348,9 @@ fn edit_float_render(frame: &mut Frame, area: Rect, app: &App) {
     frame.set_cursor_position(postion);
 }
 
-fn delete_float(frame: &mut Frame, area: Rect) {
+fn delete_float(frame: &mut Frame, area: Rect, app: &App) {
     let popup_block = Block::default().borders(Borders::ALL);
-    let popup_area = centered_rect(area);
+    let popup_area = smaller_centered_rect(area);
     let inner_area = popup_block.inner(popup_area);
 
     let main_chunks = Layout::default()
@@ -362,14 +362,38 @@ fn delete_float(frame: &mut Frame, area: Rect) {
         ])
         .split(inner_area);
 
-    let msg = Paragraph::new("Confirm delete").fg(Color::Red);
+    let msg = Paragraph::new("Confirm delete").fg(Color::Red).centered();
 
-    let choices = Paragraph::new("y/n").fg(Color::White);
+    let habit_title = Paragraph::new(format!("{}", app.current_habit.name))
+        .fg(Color::White)
+        .centered();
+
+    let choices = Paragraph::new("y/n").fg(Color::White).centered();
 
     frame.render_widget(Clear, popup_area);
     frame.render_widget(popup_block, popup_area);
     frame.render_widget(msg, main_chunks[0]);
-    frame.render_widget(choices, main_chunks[1]);
+    frame.render_widget(habit_title, main_chunks[1]);
+    frame.render_widget(choices, main_chunks[2]);
+}
+
+fn smaller_centered_rect(area: Rect) -> Rect {
+    let popup_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage((100 - 35) / 2),
+            Constraint::Percentage(35),
+            Constraint::Percentage((100 - 35) / 2),
+        ])
+        .split(area);
+    Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage((100 - 35) / 2),
+            Constraint::Percentage(35),
+            Constraint::Percentage((100 - 35) / 2),
+        ])
+        .split(popup_layout[1])[1]
 }
 
 fn centered_rect(area: Rect) -> Rect {
