@@ -190,12 +190,12 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
 
             let hint_lines = vec![
                 ListItem::new(
-                    Line::from("[Enter] Toggle Habits • [↑↓]/[hjkl] Navigate • [TAB] Switch Views")
+                    Line::from("[Enter] Toggle Habits • [↑↓]/[jk] Navigate ")
                         .fg(Color::Green)
                         .centered(),
                 ),
                 ListItem::new(
-                    Line::from("[a] Add • [e] Edit • [d] Delete • [p] Pause/Resume ")
+                    Line::from("[a] Add • [e] Edit • [d] Delete • [TAB] Switch Views ")
                         .fg(Color::Green)
                         .centered(),
                 ),
