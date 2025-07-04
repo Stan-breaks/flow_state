@@ -37,6 +37,24 @@ impl HabitStatus {
         }
     }
 }
+pub enum HabitPattern {
+    Chaotic,
+    Struggling,
+    Developing,
+    Established,
+    Mastered,
+}
+impl HabitPattern {
+    pub fn string(&self) -> &'static str {
+        match self {
+            HabitPattern::Chaotic => "Chaotic 🌪️",
+            HabitPattern::Struggling => "Struggling  😤",
+            HabitPattern::Developing => "Developing 🌱",
+            HabitPattern::Established => "Established ⚖️",
+            HabitPattern::Mastered => "Mastered 🎯",
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub enum HabitType {
