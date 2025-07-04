@@ -213,7 +213,13 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                         }
                         _ => {}
                     },
-                    ScreenMode::Deleting => {}
+                    ScreenMode::Deleting => match key.code {
+                        KeyCode::Char('y') => {}
+                        KeyCode::Char('n') => {
+                            app.toggle_normal_mode();
+                        }
+                        _ => {}
+                    },
                 },
                 CurrentScreen::Stats => match key.code {
                     KeyCode::Tab => {
