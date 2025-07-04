@@ -345,6 +345,23 @@ fn edit_float_render(frame: &mut Frame, area: Rect, app: &App) {
     frame.set_cursor_position(postion);
 }
 
+fn delete_float(frame: &mut Frame, area: Rect) {
+    let popup_block = Block::default().borders(Borders::ALL);
+    let popup_area = centered_rect(area);
+    let popup_area = popup_block.inner(popup_area);
+
+    let main_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage(20),
+            Constraint::Percentage(35),
+            Constraint::Percentage(20),
+        ])
+        .split(popup_area);
+
+    let msg = Paragraph::new("Confirm delete").fg(Color::Red);
+}
+
 fn centered_rect(area: Rect) -> Rect {
     let popup_layout = Layout::default()
         .direction(Direction::Vertical)
