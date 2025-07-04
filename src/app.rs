@@ -100,7 +100,13 @@ impl Habit {
             2 => HabitPattern::Struggling,
             3 => HabitPattern::Developing,
             4 => HabitPattern::Established,
-            5 => HabitPattern::Mastered,
+            5 => {
+                if days_since_creation < 7 {
+                    HabitPattern::Developing
+                } else {
+                    HabitPattern::Mastered
+                }
+            }
             _ => HabitPattern::Chaotic,
         }
     }
