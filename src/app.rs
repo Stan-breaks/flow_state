@@ -37,6 +37,7 @@ impl HabitStatus {
         }
     }
 }
+#[derive(PartialEq)]
 pub enum HabitPattern {
     Chaotic,
     Struggling,
