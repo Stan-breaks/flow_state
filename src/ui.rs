@@ -88,130 +88,141 @@ fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
         .split(chunk);
     match app.current_screen {
         CurrentScreen::Today => {
-            let habit_chucks = Layout::default()
-                .direction(Direction::Vertical)
-                .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
-                .split(body_chunks[0]);
-
-            let build_habit = List::new(
-                app.habits
-                    .iter()
-                    .enumerate()
-                    .filter(|(_, habit)| habit.habit_type == HabitType::Build)
-                    .enumerate()
-                    .map(|(display_idx, (_, habit))| {
-                        if display_idx + 1 == app.counter.build_counter {
-                            ListItem::new(format!(
-                                "{} [{}] {}  •  {}",
-                                habit.check_status().emoji(),
-                                display_idx + 1,
-                                habit.name,
-                                habit.check_pattern().string()
-                            ))
-                            .bg(Color::Green)
-                        } else {
-                            ListItem::new(format!(
-                                "{} [{}] {}  •  {}",
-                                habit.check_status().emoji(),
-                                display_idx + 1,
-                                habit.name,
-                                habit.check_pattern().string()
-                            ))
-                        }
-                    })
-                    .collect::<Vec<ListItem>>(),
-            )
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .title("🌟 Build These Habits")
-                    .border_style(Style::default().fg(Color::Green)),
-            );
-            frame.render_widget(build_habit, habit_chucks[0]);
-            let avoid_habit = List::new(
-                app.habits
-                    .iter()
-                    .enumerate()
-                    .filter(|(_, habit)| habit.habit_type == HabitType::Avoid)
-                    .enumerate()
-                    .map(|(display_idx, (_, habit))| {
-                        if display_idx + 1 == app.counter.avoid_counter {
-                            ListItem::new(format!(
-                                "{} [{}] {}  •  {}",
-                                habit.check_status().emoji(),
-                                display_idx + 1,
-                                habit.name,
-                                habit.check_pattern().string()
-                            ))
-                            .bg(Color::Red)
-                        } else {
-                            ListItem::new(format!(
-                                "{} [{}] {}  •  {}",
-                                habit.check_status().emoji(),
-                                display_idx + 1,
-                                habit.name,
-                                habit.check_pattern().string()
-                            ))
-                        }
-                    })
-                    .collect::<Vec<ListItem>>(),
-            )
-            .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .title("🚫 Avoid These Habits")
-                    .border_style(Style::default().fg(Color::Red)),
-            );
-            frame.render_widget(avoid_habit, habit_chucks[1]);
-            let footer_area = body_chunks[1];
-            let footer_block = Block::default().borders(Borders::ALL);
-            frame.render_widget(&footer_block, footer_area);
-
-            let inner_chunks = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([Constraint::Min(1), Constraint::Min(1)])
-                .split(footer_block.inner(footer_area));
-
-            let stat_lines = vec![
-                ListItem::new(
-                    Line::from(format!("Today: {}", app.check_todays_progress()))
-                        .fg(Color::Green)
-                        .centered(),
-                ),
-                ListItem::new(
-                    Line::from(format!("Week: {}", app.check_weeks_progress()))
-                        .fg(Color::Green)
-                        .centered(),
-                ),
-            ];
-            let stat_list = List::new(stat_lines);
-            frame.render_widget(stat_list, inner_chunks[0]);
-
-            let hint_lines = vec![
-                ListItem::new(
-                    Line::from("[Enter] Toggle Habits • [↑↓]/[jk] Navigate ")
-                        .fg(Color::Green)
-                        .centered(),
-                ),
-                ListItem::new(
-                    Line::from("[a] Add • [e] Edit • [d] Delete • [TAB] Switch Views ")
-                        .fg(Color::Green)
-                        .centered(),
-                ),
-            ];
-            let hint_list = List::new(hint_lines);
-            frame.render_widget(hint_list, inner_chunks[1]);
+            render_today_page(body_chunks, frame, app);
         }
         CurrentScreen::Stats => {
-            let hints = Paragraph::new(
-                Line::from("[P] Bulk pause • [↑↓]/[jk] Navigate")
-                    .fg(Color::Green)
-                    .centered(),
-            )
-            .block(Block::default().borders(Borders::ALL));
-            frame.render_widget(hints, body_chunks[1]);
+            render_stats_page(body_chunks, frame, app);
         }
     }
+}
+fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
+    let stat_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+        .split(body_chunks[0]);
+
+    let hints = Paragraph::new(
+        Line::from("[P] Bulk pause • [↑↓]/[jk] Navigate")
+            .fg(Color::Green)
+            .centered(),
+    )
+    .block(Block::default().borders(Borders::ALL));
+    frame.render_widget(hints, body_chunks[1]);
+}
+fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
+    let habit_chucks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+        .split(body_chunks[0]);
+
+    let build_habit = List::new(
+        app.habits
+            .iter()
+            .enumerate()
+            .filter(|(_, habit)| habit.habit_type == HabitType::Build)
+            .enumerate()
+            .map(|(display_idx, (_, habit))| {
+                if display_idx + 1 == app.counter.build_counter {
+                    ListItem::new(format!(
+                        "{} [{}] {}  •  {}",
+                        habit.check_status().emoji(),
+                        display_idx + 1,
+                        habit.name,
+                        habit.check_pattern().string()
+                    ))
+                    .bg(Color::Green)
+                } else {
+                    ListItem::new(format!(
+                        "{} [{}] {}  •  {}",
+                        habit.check_status().emoji(),
+                        display_idx + 1,
+                        habit.name,
+                        habit.check_pattern().string()
+                    ))
+                }
+            })
+            .collect::<Vec<ListItem>>(),
+    )
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title("🌟 Build These Habits")
+            .border_style(Style::default().fg(Color::Green)),
+    );
+    frame.render_widget(build_habit, habit_chucks[0]);
+    let avoid_habit = List::new(
+        app.habits
+            .iter()
+            .enumerate()
+            .filter(|(_, habit)| habit.habit_type == HabitType::Avoid)
+            .enumerate()
+            .map(|(display_idx, (_, habit))| {
+                if display_idx + 1 == app.counter.avoid_counter {
+                    ListItem::new(format!(
+                        "{} [{}] {}  •  {}",
+                        habit.check_status().emoji(),
+                        display_idx + 1,
+                        habit.name,
+                        habit.check_pattern().string()
+                    ))
+                    .bg(Color::Red)
+                } else {
+                    ListItem::new(format!(
+                        "{} [{}] {}  •  {}",
+                        habit.check_status().emoji(),
+                        display_idx + 1,
+                        habit.name,
+                        habit.check_pattern().string()
+                    ))
+                }
+            })
+            .collect::<Vec<ListItem>>(),
+    )
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title("🚫 Avoid These Habits")
+            .border_style(Style::default().fg(Color::Red)),
+    );
+    frame.render_widget(avoid_habit, habit_chucks[1]);
+    let footer_area = body_chunks[1];
+    let footer_block = Block::default().borders(Borders::ALL);
+    frame.render_widget(&footer_block, footer_area);
+
+    let inner_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Min(1), Constraint::Min(1)])
+        .split(footer_block.inner(footer_area));
+
+    let stat_lines = vec![
+        ListItem::new(
+            Line::from(format!("Today: {}", app.check_todays_progress()))
+                .fg(Color::Green)
+                .centered(),
+        ),
+        ListItem::new(
+            Line::from(format!("Week: {}", app.check_weeks_progress()))
+                .fg(Color::Green)
+                .centered(),
+        ),
+    ];
+    let stat_list = List::new(stat_lines);
+    frame.render_widget(stat_list, inner_chunks[0]);
+
+    let hint_lines = vec![
+        ListItem::new(
+            Line::from("[Enter] Toggle Habits • [↑↓]/[jk] Navigate ")
+                .fg(Color::Green)
+                .centered(),
+        ),
+        ListItem::new(
+            Line::from("[a] Add • [e] Edit • [d] Delete • [TAB] Switch Views ")
+                .fg(Color::Green)
+                .centered(),
+        ),
+    ];
+    let hint_list = List::new(hint_lines);
+    frame.render_widget(hint_list, inner_chunks[1]);
 }
 
 fn add_float_render(frame: &mut Frame, area: Rect, app: &App) {
