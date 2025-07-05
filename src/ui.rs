@@ -189,6 +189,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
             .title("🌟 Build These Habits")
             .border_style(Style::default().fg(Color::Green)),
     );
+    let build_len = build_habit.len();
     frame.render_widget(build_habit, habit_chucks[0]);
     let avoid_habit = List::new(
         app.habits
@@ -201,7 +202,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
                         habit.check_status().emoji(),
-                        display_idx + 1,
+                        display_idx + build_len + 1,
                         habit.name,
                         habit.check_pattern().string()
                     ))
@@ -210,7 +211,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
                         habit.check_status().emoji(),
-                        display_idx + 1,
+                        display_idx + build_len + 1,
                         habit.name,
                         habit.check_pattern().string()
                     ))
