@@ -126,7 +126,8 @@ fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
             "• Mastered: {} habits({}%)",
             mastered_len,
             (mastered_len as f32 / total_len as f32 * 100.00) as u32
-        )),
+        ))
+        .fg(Color::Green),
         ListItem::new(format!(
             "• Developing: {} habits({}%)",
             developing_len,
@@ -136,17 +137,34 @@ fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
             "• Chaotic: {} habits({}%)",
             chaotic_len,
             (chaotic_len as f32 / total_len as f32 * 100.00) as u32
-        )),
+        ))
+        .fg(Color::Red),
     ])
-    .block(Block::default().borders(Borders::ALL));
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title("Pattern Health Check")
+            .fg(Color::LightYellow),
+    );
     frame.render_widget(pattern_list, stat_chunks[0]);
 
-    let hints = Paragraph::new(
-        Line::from("[P] Bulk pause • [↑↓]/[jk] Navigate")
-            .fg(Color::Green)
-            .centered(),
-    )
-    .block(Block::default().borders(Borders::ALL));
+    let new = app.habits.iter().max_by_key(|h| h.created).unwrap();
+    let old = app.habits.iter().min_by_key(|h| h.created).unwrap();
+
+    let maturity_list = List::new([
+        ListItem::new(format!("Newest Habit: {}", new.name)),
+        ListItem::new(format!("Oldest Habit: {}", old.name)),
+    ])
+    .block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title("Habit maturity"),
+    );
+
+    frame.render_widget(maturity_list, stat_chunks[1]);
+
+    let hints = Paragraph::new(Line::from("[↑↓]/[jk] Navigate").fg(Color::Green).centered())
+        .block(Block::default().borders(Borders::ALL));
     frame.render_widget(hints, body_chunks[1]);
 }
 fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
