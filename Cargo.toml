@@ -3,6 +3,17 @@ name = "habit-tracker"
 version = "0.1.0"
 edition = "2021"
 
+description = "A terminal-based habit tracker."
+
+license = "GPL-3.0-or-later"
+readme = "README.md"
+
+homepage = "https://github.com/Stan-breaks/flow_state"
+repository = "https://github.com/Stan-breaks/flow_state"
+
+keywords = ["habit", "tracker", "ratatui", "terminal", "cli"]
+categories = ["command-line-utilities", "productivity"]
+
 [dependencies]
 chrono = { version = "0.4.41", features = ["serde"] }
 color-eyre = "0.6.5"
