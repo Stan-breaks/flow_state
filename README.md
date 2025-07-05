@@ -7,8 +7,6 @@ A terminal-based habit tracker designed for neurodivergent users. Focuses on pro
 - **Pattern-based tracking**: Weekly progress patterns instead of breakable streaks
 - **Neurodivergent-friendly**: Built with ADHD considerations in mind
 - **Dual habit types**: Track habits to build and habits to avoid
-- **Flexible scheduling**: Daily, weekly, and custom frequencies
-- **Pause system**: Life-aware habit management for difficult periods
 - **Minimal interface**: Keyboard-driven with essential information only
 - **Local storage**: All data stored locally using TOML files
 
@@ -26,10 +24,11 @@ Flow State addresses these issues by emphasizing patterns over perfection and pr
 
 Instead of streaks, Flow State tracks weekly patterns using a rolling 7-day window:
 
-- **Mastering** (85-100%): Strong, consistent pattern
-- **Building** (60-84%): Good momentum established  
-- **Growing** (25-59%): Pattern forming
-- **Starting** (0-24%): Beginning phase
+- **Mastered** (5): Strong, consistent pattern
+- **Established** (4): Good momentum established  
+- **Developing** (3): Pattern forming
+- **Struggling** (2): Frequent relapse
+- **Chaotic** (1): Inconsistent
 
 ## Installation
 
@@ -52,33 +51,13 @@ cargo build --release
 - `flow-state` - Start the application
 - `q` - Quit
 - `TAB` - Switch between views (Today/Manage/Stats)
-- `1-7` - Toggle habits in Today view
+- `ENTER` - Toggle habits in Today view
 - `hjkl` - Navigate (Vim-motions)
 
 ### Views
 
 **Today View**: Daily habit check-in and progress overview
-**Manage View**: Add, edit, delete, and pause habits  
-**Stats View**: Weekly and monthly progress patterns
-
-### Habit Management
-
-- Maximum 7 active habits to prevent overwhelm
-- Context fields for time, location, and prerequisites
-- Pause system for life disruptions
-- Flexible frequency options (daily/weekly/custom)
-
-## Data Storage
-
-All data is stored locally in `~/.config/flow-state/`:
-
-```
-~/.config/flow-state/
-├── config.toml       # Application settings
-├── habits.toml       # Habit definitions
-├── data/             # Monthly progress data
-└── backups/          # Automatic backups
-```
+**Stats View**: Pattern health check and habit maturity
 
 ## Technical Details
 
@@ -99,7 +78,6 @@ All data is stored locally in `~/.config/flow-state/`:
 
 ```bash
 cargo build
-cargo test
 cargo run
 ```
 
@@ -111,10 +89,6 @@ Contributions welcome, especially from neurodivergent developers who understand 
 - ADHD-friendly UX enhancements
 - Performance optimizations
 - Cross-platform compatibility
-
-## License
-
-MIT License
 
 ## Acknowledgments
 
