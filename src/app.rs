@@ -87,6 +87,17 @@ impl Habit {
             self.days_completed.remove(&day_completed);
         }
     }
+    pub fn check_raw_pattern(&self) -> i32 {
+        let days_since_creation = Utc::now()
+            .date_naive()
+            .signed_duration_since(self.created)
+            .num_days()
+            .max(1);
+        let check_ins = self.days_completed.len();
+        ((check_ins as f32 / days_since_creation as f32 * 5.0).round() as i32)
+            .max(0)
+            .min(5)
+    }
     pub fn check_pattern(&self) -> HabitPattern {
         let days_since_creation = Utc::now()
             .date_naive()
@@ -393,5 +404,29 @@ impl App {
         self.current_habit.created = Utc::now().date_naive();
         self.habits.push(self.current_habit.clone());
         self.toggle_normal_mode();
+    }
+    pub fn find_best_habit(&self) -> Habit {
+        let mut best_score = self.habits[0].check_raw_pattern();
+        let mut best_index = 0;
+        for i in 1..self.habits.len() {
+            let score = self.habits[i].check_raw_pattern();
+            if best_score < score {
+                best_index = i;
+                best_score = score;
+            }
+        }
+        self.habits[best_index].clone()
+    }
+    pub fn find_worst_habit(&self) -> Habit {
+        let mut worst_score = self.habits[0].check_raw_pattern();
+        let mut worst_index = 0;
+        for i in 1..self.habits.len() {
+            let score = self.habits[i].check_raw_pattern();
+            if worst_score > score {
+                worst_score = score;
+                worst_index = i
+            }
+        }
+        self.habits[worst_index].clone()
     }
 }
