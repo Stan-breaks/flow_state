@@ -12,7 +12,6 @@ homepage = "https://github.com/Stan-breaks/flow_state"
 repository = "https://github.com/Stan-breaks/flow_state"
 
 keywords = ["habit", "tracker", "ratatui", "terminal", "cli"]
-categories = ["command-line-utilities", "productivity"]
 
 [dependencies]
 chrono = { version = "0.4.41", features = ["serde"] }
