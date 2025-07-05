@@ -4,7 +4,7 @@ use crate::app::{App, CurrentScreen, Habit, HabitPattern, HabitType, ScreenMode}
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Position, Rect},
     style::{Color, Style, Stylize},
-    text::Line,
+    text::{Line, Span},
     widgets::{block, Block, Borders, Clear, List, ListItem, Paragraph},
     Frame,
 };
@@ -122,23 +122,39 @@ fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
         .len();
 
     let pattern_list = List::new([
-        ListItem::new(format!(
-            "• Mastered: {} habits({}%)",
-            mastered_len,
-            (mastered_len as f32 / total_len as f32 * 100.00) as u32
-        ))
-        .fg(Color::Green),
-        ListItem::new(format!(
-            "• Developing: {} habits({}%)",
-            developing_len,
-            (developing_len as f32 / total_len as f32 * 100.00) as u32
-        )),
-        ListItem::new(format!(
-            "• Chaotic: {} habits({}%)",
-            chaotic_len,
-            (chaotic_len as f32 / total_len as f32 * 100.00) as u32
-        ))
-        .fg(Color::Red),
+        ListItem::new(Line::from(vec![
+            Span::styled("• Mastered: ", Style::default().fg(Color::Green)),
+            Span::styled(
+                format!(
+                    "{} habits({}%)",
+                    mastered_len,
+                    (mastered_len as f32 / total_len as f32 * 100.0) as u32
+                ),
+                Style::default().fg(Color::White),
+            ),
+        ])),
+        ListItem::new(Line::from(vec![
+            Span::styled("• Developing: ", Style::default().fg(Color::Yellow)),
+            Span::styled(
+                format!(
+                    "{} habits({}%)",
+                    developing_len,
+                    (developing_len as f32 / total_len as f32 * 100.0) as u32
+                ),
+                Style::default().fg(Color::White),
+            ),
+        ])),
+        ListItem::new(Line::from(vec![
+            Span::styled("• Chaotic: ", Style::default().fg(Color::Red)),
+            Span::styled(
+                format!(
+                    "{} habits({}%)",
+                    chaotic_len,
+                    (chaotic_len as f32 / total_len as f32 * 100.0) as u32
+                ),
+                Style::default().fg(Color::White),
+            ),
+        ])),
     ])
     .block(
         Block::default()
@@ -146,6 +162,7 @@ fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
             .title("Pattern Health Check")
             .fg(Color::LightYellow),
     );
+
     frame.render_widget(pattern_list, stat_chunks[0]);
 
     let new = app.habits.iter().max_by_key(|h| h.created).unwrap();
@@ -154,10 +171,22 @@ fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
     let worst = app.find_worst_habit();
 
     let maturity_list = List::new([
-        ListItem::new(format!("• Newest Habit: {}", new.name)),
-        ListItem::new(format!("• Oldest Habit: {}", old.name)),
-        ListItem::new(format!("• Best Habit: {}", best.name)).fg(Color::Green),
-        ListItem::new(format!("• Worst Habit: {}", worst.name)).fg(Color::Red),
+        ListItem::new(Line::from(vec![
+            Span::styled("• Newest Habit: ", Style::default().fg(Color::LightYellow)),
+            Span::styled(new.name.clone(), Style::default().fg(Color::White)),
+        ])),
+        ListItem::new(Line::from(vec![
+            Span::styled("• Oldest Habit: ", Style::default().fg(Color::LightYellow)),
+            Span::styled(old.name.clone(), Style::default().fg(Color::White)),
+        ])),
+        ListItem::new(Line::from(vec![
+            Span::styled("• Best Habit: ", Style::default().fg(Color::Green)),
+            Span::styled(best.name.clone(), Style::default().fg(Color::White)),
+        ])),
+        ListItem::new(Line::from(vec![
+            Span::styled("• Worst Habit: ", Style::default().fg(Color::Red)),
+            Span::styled(worst.name.clone(), Style::default().fg(Color::White)),
+        ])),
     ])
     .block(
         Block::default()
@@ -168,7 +197,7 @@ fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
 
     frame.render_widget(maturity_list, stat_chunks[1]);
 
-    let hints = Paragraph::new(Line::from("[↑↓]/[jk] Navigate").fg(Color::Green).centered())
+    let hints = Paragraph::new(Line::from("").fg(Color::Green).centered())
         .block(Block::default().borders(Borders::ALL));
     frame.render_widget(hints, body_chunks[1]);
 }
