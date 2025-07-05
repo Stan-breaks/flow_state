@@ -33,7 +33,7 @@ Instead of streaks, Flow State tracks weekly patterns.
 ## Installation
 
 ```bash
-cargo install flow-state
+cargo install flow_state
 ```
 
 Or build from source:
@@ -45,6 +45,10 @@ cargo build --release
 ```
 
 ## Usage
+
+```bash
+flow_state
+```
 
 ### Basic Commands
 
