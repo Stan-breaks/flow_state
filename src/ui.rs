@@ -1,11 +1,11 @@
 use std::rc::Rc;
 
-use crate::app::{App, CurrentScreen, HabitType, ScreenMode};
+use crate::app::{App, CurrentScreen, Habit, HabitPattern, HabitType, ScreenMode};
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Position, Rect},
     style::{Color, Style, Stylize},
     text::Line,
-    widgets::{Block, Borders, Clear, List, ListItem, Paragraph},
+    widgets::{block, Block, Borders, Clear, List, ListItem, Paragraph},
     Frame,
 };
 
@@ -100,6 +100,46 @@ fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
         .direction(Direction::Vertical)
         .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
         .split(body_chunks[0]);
+
+    let total_len = app.habits.len();
+    let mastered_len = app
+        .habits
+        .iter()
+        .filter(|h| h.check_pattern() == HabitPattern::Mastered)
+        .collect::<Vec<&Habit>>()
+        .len();
+    let developing_len = app
+        .habits
+        .iter()
+        .filter(|h| h.check_pattern() == HabitPattern::Developing)
+        .collect::<Vec<&Habit>>()
+        .len();
+    let chaotic_len = app
+        .habits
+        .iter()
+        .filter(|h| h.check_pattern() == HabitPattern::Chaotic)
+        .collect::<Vec<&Habit>>()
+        .len();
+
+    let pattern_list = List::new([
+        ListItem::new(format!(
+            "• Mastered: {} habits({}%)",
+            mastered_len,
+            (mastered_len as f32 / total_len as f32 * 100.00) as u32
+        )),
+        ListItem::new(format!(
+            "• Developing: {} habits({}%)",
+            developing_len,
+            (developing_len as f32 / total_len as f32 * 100.00) as u32
+        )),
+        ListItem::new(format!(
+            "• Chaotic: {} habits({}%)",
+            chaotic_len,
+            (chaotic_len as f32 / total_len as f32 * 100.00) as u32
+        )),
+    ])
+    .block(Block::default().borders(Borders::ALL));
+    frame.render_widget(pattern_list, stat_chunks[0]);
 
     let hints = Paragraph::new(
         Line::from("[P] Bulk pause • [↑↓]/[jk] Navigate")
