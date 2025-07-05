@@ -150,15 +150,20 @@ fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
 
     let new = app.habits.iter().max_by_key(|h| h.created).unwrap();
     let old = app.habits.iter().min_by_key(|h| h.created).unwrap();
+    let best = app.find_best_habit();
+    let worst = app.find_worst_habit();
 
     let maturity_list = List::new([
-        ListItem::new(format!("Newest Habit: {}", new.name)),
-        ListItem::new(format!("Oldest Habit: {}", old.name)),
+        ListItem::new(format!("• Newest Habit: {}", new.name)),
+        ListItem::new(format!("• Oldest Habit: {}", old.name)),
+        ListItem::new(format!("• Best Habit: {}", best.name)).fg(Color::Green),
+        ListItem::new(format!("• Worst Habit: {}", worst.name)).fg(Color::Red),
     ])
     .block(
         Block::default()
             .borders(Borders::ALL)
-            .title("Habit maturity"),
+            .title("Habit maturity")
+            .fg(Color::LightYellow),
     );
 
     frame.render_widget(maturity_list, stat_chunks[1]);
