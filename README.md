@@ -22,7 +22,7 @@ Flow State addresses these issues by emphasizing patterns over perfection and pr
 
 ## Progress System
 
-Instead of streaks, Flow State tracks weekly patterns using a rolling 7-day window:
+Instead of streaks, Flow State tracks weekly patterns.
 
 - **Mastered** (5): Strong, consistent pattern
 - **Established** (4): Good momentum established  
