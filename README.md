@@ -2,6 +2,8 @@
 
 A terminal-based habit tracker designed for neurodivergent users. Focuses on progress patterns rather than perfect streaks.
 
+<img width="1366" height="768" alt="250705_15h53m01s_screenshot" src="https://github.com/user-attachments/assets/c9f2d273-c880-4c57-8c91-32b3ba982224" />
+
 ## Features
 
 - **Pattern-based tracking**: Weekly progress patterns instead of breakable streaks
