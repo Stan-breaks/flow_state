@@ -37,11 +37,9 @@ jobs:
       # Package for Linux/macOS
       - name: Package binary (tar.gz)
         if: matrix.archive == 'tar.gz'
-        shell: bash
         run: |
           cd target/${{ matrix.target }}/release
-          tar -czf flow_state-${{ github.ref_name }}-${{ matrix.target }}.tar.gz flow_state
-          mv flow_state-*${{ matrix.archive }} ../../../..
+          tar -czf ../../../flow_state-${{ github.ref_name }}-${{ matrix.target }}.tar.gz flow_state
 
       # Package for Windows
       - name: Package binary (zip)
@@ -50,7 +48,6 @@ jobs:
         run: |
           $outFile = "flow_state-${{ github.ref_name }}-${{ matrix.target }}.zip"
           Compress-Archive -Path "target/${{ matrix.target }}/release/flow_state.exe" -DestinationPath $outFile
-          Move-Item $outFile .
 
       - name: Upload archive
         uses: actions/upload-artifact@v4
