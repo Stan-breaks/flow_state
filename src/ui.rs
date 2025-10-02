@@ -222,7 +222,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                         habit.name,
                         habit.check_pattern().string()
                     ))
-                    .bg(Color::Green)
+                    .bg(Color::Green).fg(Color::Black)
                 } else {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
@@ -258,7 +258,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                         habit.name,
                         habit.check_pattern().string()
                     ))
-                    .bg(Color::Red)
+                    .bg(Color::Red).fg(Color::Black)
                 } else {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
