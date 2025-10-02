@@ -13,13 +13,13 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            archive: tar.gz
+            ext: tar.gz
           - os: macos-latest
             target: x86_64-apple-darwin
-            archive: zip
+            ext: zip
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            archive: zip
+            ext: zip
 
     steps:
       - name: Checkout code
@@ -36,21 +36,27 @@ jobs:
       - name: Package binary
         run: |
           cd target/${{ matrix.target }}/release
-          BINARY_NAME=flow_state
+          BIN=flow_state
 
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            BINARY_NAME="${BINARY_NAME}.exe"
-            7z a "${BINARY_NAME}-${{ matrix.target }}.zip" "$BINARY_NAME"
-          elif [ "${{ matrix.archive }}" = "zip" ]; then
-            zip "${BINARY_NAME}-${{ matrix.target }}.zip" "$BINARY_NAME"
+            BIN="${BIN}.exe"
+          fi
+
+          ARCHIVE="${BIN}-${{ matrix.target }}.${{ matrix.ext }}"
+
+          if [ "${{ matrix.ext }}" = "zip" ]; then
+            zip "$ARCHIVE" "$BIN"
           else
-            tar -czvf "${BINARY_NAME}-${{ matrix.target }}.tar.gz" "$BINARY_NAME"
+            tar -czvf "$ARCHIVE" "$BIN"
           fi
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: target/${{ matrix.target }}/release/*.{zip,tar.gz}
+          tag_name: ${{ github.ref_name }}
+          files: |
+            target/${{ matrix.target }}/release/*.zip
+            target/${{ matrix.target }}/release/*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
