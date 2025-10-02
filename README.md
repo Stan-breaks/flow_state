@@ -96,6 +96,7 @@ Contributions welcome, especially from neurodivergent developers who understand 
 - Performance optimizations
 - Cross-platform compatibility
 
+
 ## Acknowledgments
 
 Built with input from the neurodivergent community to create tools that work with different brain types rather than against them.
