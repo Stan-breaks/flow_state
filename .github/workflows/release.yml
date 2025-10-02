@@ -34,16 +34,23 @@ jobs:
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
 
-      - name: Package binary
+      # Package for Linux/macOS
+      - name: Package binary (tar.gz)
+        if: matrix.archive == 'tar.gz'
         shell: bash
         run: |
           cd target/${{ matrix.target }}/release
-          if [[ "${{ matrix.archive }}" == "zip" ]]; then
-            zip flow_state-${{ github.ref_name }}-${{ matrix.target }}.zip flow_state.exe
-          else
-            tar -czf flow_state-${{ github.ref_name }}-${{ matrix.target }}.tar.gz flow_state
-          fi
+          tar -czf flow_state-${{ github.ref_name }}-${{ matrix.target }}.tar.gz flow_state
           mv flow_state-*${{ matrix.archive }} ../../../..
+
+      # Package for Windows
+      - name: Package binary (zip)
+        if: matrix.archive == 'zip'
+        shell: pwsh
+        run: |
+          $outFile = "flow_state-${{ github.ref_name }}-${{ matrix.target }}.zip"
+          Compress-Archive -Path "target/${{ matrix.target }}/release/flow_state.exe" -DestinationPath $outFile
+          Move-Item $outFile .
 
       - name: Upload archive
         uses: actions/upload-artifact@v4
