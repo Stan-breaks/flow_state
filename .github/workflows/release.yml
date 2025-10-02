@@ -17,10 +17,40 @@ jobs:
             target: x86_64-apple-darwin
           - os: windows-latest
             target: x86_64-pc-windows-msvc
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
-      - run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}-binary
+          path: |
+            target/${{ matrix.target }}/release/flow_state*
+            target/${{ matrix.target }}/release/flow_state.exe
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display downloaded files
+        run: ls -R artifacts
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
