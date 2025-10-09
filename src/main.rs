@@ -143,6 +143,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                                 }
                                 app.habits[index].toggle_complete();
                             }
+                            app.save_habits().unwrap();
                         }
                         KeyCode::Char('d') => {
                             if !app.counter.switch && app.counter.build_counter > 0 {
