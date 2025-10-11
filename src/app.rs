@@ -25,6 +25,12 @@ pub enum ScreenMode {
     Deleting,
 }
 
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub enum Day {
+    Today,
+    Yesterday,
+}
+
 pub enum HabitStatus {
     Complete,
     InComplete,
@@ -71,8 +77,11 @@ pub struct Habit {
     pub created: NaiveDate,
 }
 impl Habit {
-    pub fn check_status(&self) -> HabitStatus {
-        let today = Utc::now().date_naive();
+    pub fn check_status(&self, day: Day) -> HabitStatus {
+        let mut today = Utc::now().date_naive();
+        if day == Day::Yesterday {
+            today = today - Duration::days(1);
+        }
         for i in self.days_completed.iter() {
             if &today == i {
                 return HabitStatus::Complete;
@@ -80,9 +89,13 @@ impl Habit {
         }
         HabitStatus::InComplete
     }
-    pub fn toggle_complete(&mut self) {
+    pub fn toggle_complete(&mut self, day: Day) {
         let today = Utc::now();
-        let day_completed = today.date_naive();
+        let mut day_completed = today.date_naive();
+        if day == Day::Yesterday {
+            day_completed = day_completed - Duration::days(1);
+        }
+
         if !self.days_completed.insert(day_completed.clone()) {
             self.days_completed.remove(&day_completed);
         }
@@ -134,6 +147,7 @@ pub struct App {
     pub current_screen: CurrentScreen,
     pub screen_mode: ScreenMode,
     pub current_habit: Habit,
+    pub current_day: Day,
 }
 impl App {
     pub fn new() -> Self {
@@ -147,6 +161,7 @@ impl App {
             },
             current_screen: CurrentScreen::Today,
             screen_mode: ScreenMode::Normal,
+            current_day: Day::Today,
             current_habit: Habit {
                 name: String::default(),
                 habit_type: HabitType::Build,
@@ -275,14 +290,16 @@ impl App {
         let index = ((progress / 10.0) as usize).min(10);
         format!("{} {:.1}%", segments[index], progress,)
     }
-    pub fn check_todays_progress(&self) -> String {
+    pub fn check_todays_progress(&self, day: Day) -> String {
         let length = self.habits.len();
         if length == 0 {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, length);
         }
 
-        let today = Utc::now();
-        let today = today.date_naive();
+        let mut today = Utc::now().date_naive();
+        if day == Day::Yesterday {
+            today = today - Duration::days(1);
+        }
 
         let mut counter = 0;
         for habit in self.habits.iter() {
@@ -387,6 +404,12 @@ impl App {
                     self.current_habit = self.habits[index].clone();
                 }
             }
+        }
+    }
+    pub fn toggle_day(&mut self) {
+        match self.current_day {
+            Day::Today => self.current_day = Day::Yesterday,
+            Day::Yesterday => self.current_day = Day::Today,
         }
     }
     pub fn toggle_habit_type(&mut self) {
