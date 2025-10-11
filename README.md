@@ -57,6 +57,7 @@ flow_state
 - `flow-state` - Start the application
 - `q` - Quit
 - `TAB` - Switch between views (Today/Manage/Stats)
+- `y` - Switch between editing Today and Yesterday, in case you forgot to mark things off
 - `ENTER` - Toggle habits in Today view
 - `hjkl` - Navigate (Vim-motions)
 
