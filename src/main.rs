@@ -112,6 +112,9 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                             }
                             _ => {}
                         },
+                        KeyCode::Char('y') => {
+                            app.toggle_day();
+                        },
                         KeyCode::Enter => {
                             if !app.counter.switch && app.counter.build_counter > 0 {
                                 let build_habit = app
@@ -126,7 +129,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                                         break;
                                     }
                                 }
-                                app.habits[index].toggle_complete();
+                                app.habits[index].toggle_complete(app.current_day.clone());
                             }
                             if app.counter.switch && app.counter.avoid_counter > 0 {
                                 let avoid_habit = app
@@ -141,7 +144,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                                         break;
                                     }
                                 }
-                                app.habits[index].toggle_complete();
+                                app.habits[index].toggle_complete(app.current_day.clone());
                             }
                         }
                         KeyCode::Char('d') => {
