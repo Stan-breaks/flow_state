@@ -317,7 +317,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                 .centered(),
         ),
         ListItem::new(
-            Line::from("[a] Add • [e] Edit • [d] Delete • [y] switch today/yesterday • [TAB] Switch Views ")
+            Line::from("[a] Add • [e] Edit • [d] Delete • [y] Switch Day • [TAB] Switch Views ")
                 .fg(Color::Green)
                 .centered(),
         ),
