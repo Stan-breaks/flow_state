@@ -1,6 +1,6 @@
 [package]
 name = "flow_state"
-version = "0.1.0"
+version = "1.0.4"
 edition = "2021"
 
 description = "A terminal-based habit tracker."
