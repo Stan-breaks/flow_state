@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::app::{App, CurrentScreen, Habit, HabitPattern, HabitType, ScreenMode};
+use crate::app::{App, CurrentScreen, Day, Habit, HabitPattern, HabitType, ScreenMode};
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Position, Rect},
     style::{Color, Style, Stylize},
@@ -61,12 +61,15 @@ fn render_tab(chunk: Rect, frame: &mut Frame, app: &App) {
         .direction(Direction::Horizontal)
         .constraints([Constraint::Min(1), Constraint::Min(1)])
         .split(chunk);
-
+    let day_name = match app.current_day.clone() {
+        Day::Today => "Today",
+        Day::Yesterday => "Yesterday",
+    };
     let today_tab = match app.current_screen {
         CurrentScreen::Today => {
-            Paragraph::new(Line::from("Today").fg(Color::Black).bg(Color::LightYellow)).centered()
+            Paragraph::new(Line::from(day_name).fg(Color::Black).bg(Color::LightYellow)).centered()
         }
-        _ => Paragraph::new(Line::from("Today")).centered(),
+        _ => Paragraph::new(Line::from(day_name)).centered(),
     }
     .block(Block::default().borders(Borders::ALL));
     frame.render_widget(today_tab, tab_chunks[0]);
@@ -217,7 +220,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                 if display_idx + 1 == app.counter.build_counter {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
-                        habit.check_status().emoji(),
+                        habit.check_status(app.current_day.clone()).emoji(),
                         display_idx + 1,
                         habit.name,
                         habit.check_pattern().string()
@@ -226,7 +229,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                 } else {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
-                        habit.check_status().emoji(),
+                        habit.check_status(app.current_day.clone()).emoji(),
                         display_idx + 1,
                         habit.name,
                         habit.check_pattern().string()
@@ -253,7 +256,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                 if display_idx + 1 == app.counter.avoid_counter {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
-                        habit.check_status().emoji(),
+                        habit.check_status(app.current_day.clone()).emoji(),
                         display_idx + build_len + 1,
                         habit.name,
                         habit.check_pattern().string()
@@ -262,7 +265,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                 } else {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
-                        habit.check_status().emoji(),
+                        habit.check_status(app.current_day.clone()).emoji(),
                         display_idx + build_len + 1,
                         habit.name,
                         habit.check_pattern().string()
@@ -287,9 +290,14 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
         .constraints([Constraint::Min(1), Constraint::Min(1)])
         .split(footer_block.inner(footer_area));
 
+    let day_name = match app.current_day {
+        Day::Today => "Today",
+        Day::Yesterday => "Yesterday",
+    };
+
     let stat_lines = vec![
         ListItem::new(
-            Line::from(format!("Today: {}", app.check_todays_progress()))
+            Line::from(format!("{}: {}", day_name, app.check_todays_progress(app.current_day.clone())))
                 .fg(Color::Green)
                 .centered(),
         ),
@@ -309,7 +317,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                 .centered(),
         ),
         ListItem::new(
-            Line::from("[a] Add • [e] Edit • [d] Delete • [TAB] Switch Views ")
+            Line::from("[a] Add • [e] Edit • [d] Delete • [y] Switch Day • [TAB] Switch Views ")
                 .fg(Color::Green)
                 .centered(),
         ),
