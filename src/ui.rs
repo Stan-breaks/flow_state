@@ -312,7 +312,7 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
 
     let hint_lines = vec![
         ListItem::new(
-            Line::from("[Enter] Toggle Habits • [↑↓]/[jk] Navigate ")
+            Line::from("[Enter]/[Space] Toggle Habits • [↑↓]/[jk] Navigate • [r] reset habit")
                 .fg(Color::Green)
                 .centered(),
         ),

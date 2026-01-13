@@ -100,6 +100,12 @@ impl Habit {
             self.days_completed.remove(&day_completed);
         }
     }
+    pub fn reset(&mut self){
+        let today = Utc::now().date_naive();
+        self.days_completed.clear();
+        self.created = today;
+
+    }
     pub fn check_raw_pattern(&self) -> i32 {
         let days_since_creation = Utc::now()
             .date_naive()
