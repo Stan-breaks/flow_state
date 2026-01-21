@@ -73,36 +73,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                         },
                         KeyCode::Char('r') => match app.screen_mode {
                             ScreenMode::Normal => {
-                                if !app.counter.switch && app.counter.build_counter > 0 {
-                                    let build_habit = app
-                                        .habits
-                                        .iter()
-                                        .filter(|habit| habit.habit_type == HabitType::Build)
-                                        .collect::<Vec<&Habit>>()[app.counter.build_counter - 1];
-                                    let mut index = 0;
-                                    for i in 0..app.habits.len() {
-                                        if &app.habits[i] == build_habit {
-                                            index = i;
-                                            break;
-                                        }
-                                    }
-                                    app.habits[index].reset();
-                                }
-                                if app.counter.switch && app.counter.avoid_counter > 0 {
-                                    let avoid_habit = app
-                                        .habits
-                                        .iter()
-                                        .filter(|habit| habit.habit_type == HabitType::Avoid)
-                                        .collect::<Vec<&Habit>>()[app.counter.avoid_counter - 1];
-                                    let mut index = 0;
-                                    for i in 0..app.habits.len() {
-                                        if &app.habits[i] == avoid_habit {
-                                            index = 1;
-                                            break;
-                                        }
-                                    }
-                                    app.habits[index].reset();
-                                }
+                                app.toggle_reset_mode();
                             }
                             _ => {}
                         },
@@ -114,38 +85,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                         },
                         KeyCode::Char('e') => match app.screen_mode {
                             ScreenMode::Normal => {
-                                if !app.counter.switch && app.counter.build_counter > 0 {
-                                    let build_habit = app
-                                        .habits
-                                        .iter()
-                                        .filter(|habit| habit.habit_type == HabitType::Build)
-                                        .collect::<Vec<&Habit>>()[app.counter.build_counter - 1];
-                                    let mut index = 0;
-                                    for i in 0..app.habits.len() {
-                                        if &app.habits[i] == build_habit {
-                                            index = i;
-                                            break;
-                                        }
-                                    }
-                                    if index != 0 {
-                                        app.toggle_edit_mode(app.habits[index].clone());
-                                    }
-                                }
-                                if app.counter.switch && app.counter.avoid_counter > 0 {
-                                    let avoid_habit = app
-                                        .habits
-                                        .iter()
-                                        .filter(|habit| habit.habit_type == HabitType::Avoid)
-                                        .collect::<Vec<&Habit>>()[app.counter.avoid_counter - 1];
-                                    let mut index = 0;
-                                    for i in 0..app.habits.len() {
-                                        if &app.habits[i] == avoid_habit {
-                                            index = i;
-                                            break;
-                                        }
-                                    }
-                                    app.toggle_edit_mode(app.habits[index].clone());
-                                }
+                                app.toggle_edit_mode(app.habits[app.counter.index].clone());
                             }
                             _ => {}
                         },
@@ -153,36 +93,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                             app.toggle_day();
                         }
                         KeyCode::Enter | KeyCode::Char(' ') => {
-                            if !app.counter.switch && app.counter.build_counter > 0 {
-                                let build_habit = app
-                                    .habits
-                                    .iter()
-                                    .filter(|habit| habit.habit_type == HabitType::Build)
-                                    .collect::<Vec<&Habit>>()[app.counter.build_counter - 1];
-                                let mut index = 0;
-                                for i in 0..app.habits.len() {
-                                    if &app.habits[i] == build_habit {
-                                        index = i;
-                                        break;
-                                    }
-                                }
-                                app.habits[index].toggle_complete(app.current_day.clone());
-                            }
-                            if app.counter.switch && app.counter.avoid_counter > 0 {
-                                let avoid_habit = app
-                                    .habits
-                                    .iter()
-                                    .filter(|habit| habit.habit_type == HabitType::Avoid)
-                                    .collect::<Vec<&Habit>>()[app.counter.avoid_counter - 1];
-                                let mut index = 0;
-                                for i in 0..app.habits.len() {
-                                    if &app.habits[i] == avoid_habit {
-                                        index = i;
-                                        break;
-                                    }
-                                }
-                                app.habits[index].toggle_complete(app.current_day.clone());
-                            }
+                            app.habits[app.counter.index].toggle_complete(app.current_day.clone());
                             app.save_habits().unwrap();
                         }
                         KeyCode::Char('d') => {
@@ -218,36 +129,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                             app.current_habit.name.pop();
                         }
                         KeyCode::Enter => {
-                            if !app.counter.switch && app.counter.build_counter > 0 {
-                                let build_habit = app
-                                    .habits
-                                    .iter()
-                                    .filter(|habit| habit.habit_type == HabitType::Build)
-                                    .collect::<Vec<&Habit>>()[app.counter.build_counter - 1];
-                                let mut index = 0;
-                                for i in 0..app.habits.len() {
-                                    if &app.habits[i] == build_habit {
-                                        index = i;
-                                        break;
-                                    }
-                                }
-                                app.edit_habit(index);
-                            }
-                            if app.counter.switch && app.counter.avoid_counter > 0 {
-                                let avoid_habit = app
-                                    .habits
-                                    .iter()
-                                    .filter(|habit| habit.habit_type == HabitType::Avoid)
-                                    .collect::<Vec<&Habit>>()[app.counter.avoid_counter - 1];
-                                let mut index = 0;
-                                for i in 0..app.habits.len() {
-                                    if &app.habits[i] == avoid_habit {
-                                        index = i;
-                                        break;
-                                    }
-                                }
-                                app.edit_habit(index);
-                            }
+                            app.edit_habit(app.counter.index);
                         }
                         KeyCode::Char(value) => {
                             app.current_habit.name.push(value);
@@ -256,36 +138,17 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                     },
                     ScreenMode::Deleting => match key.code {
                         KeyCode::Char('y') => {
-                            if !app.counter.switch && app.counter.build_counter > 0 {
-                                let build_habit = app
-                                    .habits
-                                    .iter()
-                                    .filter(|habit| habit.habit_type == HabitType::Build)
-                                    .collect::<Vec<&Habit>>()[app.counter.build_counter - 1];
-                                let mut index = 0;
-                                for i in 0..app.habits.len() {
-                                    if &app.habits[i] == build_habit {
-                                        index = i;
-                                        break;
-                                    }
-                                }
-                                app.habits.remove(index);
-                            }
-                            if app.counter.switch && app.counter.avoid_counter > 0 {
-                                let avoid_habit = app
-                                    .habits
-                                    .iter()
-                                    .filter(|habit| habit.habit_type == HabitType::Avoid)
-                                    .collect::<Vec<&Habit>>()[app.counter.avoid_counter - 1];
-                                let mut index = 0;
-                                for i in 0..app.habits.len() {
-                                    if &app.habits[i] == avoid_habit {
-                                        index = i;
-                                        break;
-                                    }
-                                }
-                                app.habits.remove(index);
-                            }
+                            app.habits.remove(app.counter.index);
+                            app.toggle_normal_mode();
+                        }
+                        KeyCode::Char('n') => {
+                            app.toggle_normal_mode();
+                        }
+                        _ => {}
+                    },
+                    ScreenMode::Reset => match key.code {
+                        KeyCode::Char('y') => {
+                            app.habits[app.counter.index].reset();
                             app.toggle_normal_mode();
                         }
                         KeyCode::Char('n') => {

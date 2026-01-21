@@ -37,7 +37,10 @@ fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame, app: &App) {
             edit_float_render(frame, area, app);
         }
         ScreenMode::Deleting => {
-            delete_float(frame, area, app);
+            confirm_float(frame, area, app,"Confirm delete");
+        }
+        ScreenMode::Reset =>{
+            confirm_float(frame, area, app, "Confirm reset");
         }
         _ => {}
     };
@@ -456,7 +459,7 @@ fn edit_float_render(frame: &mut Frame, area: Rect, app: &App) {
     frame.set_cursor_position(postion);
 }
 
-fn delete_float(frame: &mut Frame, area: Rect, app: &App) {
+fn confirm_float(frame: &mut Frame, area: Rect, app: &App, message: &str) {
     let popup_block = Block::default().borders(Borders::ALL);
     let popup_area = smaller_centered_rect(area);
     let inner_area = popup_block.inner(popup_area);
@@ -470,7 +473,7 @@ fn delete_float(frame: &mut Frame, area: Rect, app: &App) {
         ])
         .split(inner_area);
 
-    let msg = Paragraph::new("Confirm delete").fg(Color::Red).centered();
+    let msg = Paragraph::new(message).fg(Color::Red).centered();
 
     let habit_title = Paragraph::new(format!("{}", app.current_habit.name))
         .fg(Color::White)

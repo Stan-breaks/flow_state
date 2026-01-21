@@ -23,6 +23,7 @@ pub enum ScreenMode {
     Adding,
     Editing,
     Deleting,
+    Reset,
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
@@ -100,11 +101,10 @@ impl Habit {
             self.days_completed.remove(&day_completed);
         }
     }
-    pub fn reset(&mut self){
+    pub fn reset(&mut self) {
         let today = Utc::now().date_naive();
         self.days_completed.clear();
         self.created = today;
-
     }
     pub fn check_raw_pattern(&self) -> i32 {
         let days_since_creation = Utc::now()
@@ -377,39 +377,13 @@ impl App {
     pub fn toggle_delete_mode(&mut self) {
         match self.screen_mode {
             ScreenMode::Deleting => {}
-            _ => {
-                self.screen_mode = ScreenMode::Deleting;
-                if !self.counter.switch && self.counter.build_counter > 0 {
-                    let build_habit = self
-                        .habits
-                        .iter()
-                        .filter(|habit| habit.habit_type == HabitType::Build)
-                        .collect::<Vec<&Habit>>()[self.counter.build_counter - 1];
-                    let mut index = 0;
-                    for i in 0..self.habits.len() {
-                        if &self.habits[i] == build_habit {
-                            index = i;
-                            break;
-                        }
-                    }
-                    self.current_habit = self.habits[index].clone();
-                }
-                if self.counter.switch && self.counter.avoid_counter > 0 {
-                    let avoid_habit = self
-                        .habits
-                        .iter()
-                        .filter(|habit| habit.habit_type == HabitType::Avoid)
-                        .collect::<Vec<&Habit>>()[self.counter.avoid_counter - 1];
-                    let mut index = 0;
-                    for i in 0..self.habits.len() {
-                        if &self.habits[i] == avoid_habit {
-                            index = i;
-                            break;
-                        }
-                    }
-                    self.current_habit = self.habits[index].clone();
-                }
-            }
+            _ => self.screen_mode = ScreenMode::Deleting,
+        }
+    }
+    pub fn toggle_reset_mode(&mut self) {
+        match self.screen_mode {
+            ScreenMode::Reset => {}
+            _ => {self.screen_mode = ScreenMode::Reset}
         }
     }
     pub fn toggle_day(&mut self) {
