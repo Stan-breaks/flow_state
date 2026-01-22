@@ -145,10 +145,12 @@ impl Habit {
 
 #[derive(Serialize, Deserialize, Clone)]
 struct HabitsData {
-    habits: Vec<Habit>,
+    build_habits: Vec<Habit>,
+    avoid_habits: Vec<Habit>,
 }
 pub struct App {
-    pub habits: Vec<Habit>,
+    pub build_habits: Vec<Habit>,
+    pub avoid_habits: Vec<Habit>,
     pub counter: Counter,
     pub current_screen: CurrentScreen,
     pub screen_mode: ScreenMode,
@@ -158,7 +160,8 @@ pub struct App {
 impl App {
     pub fn new() -> Self {
         App {
-            habits: Vec::default(),
+            build_habits: Vec::default(),
+            avoid_habits: Vec::default(),
             counter: Counter {
                 index: 0,
                 build_counter: 0,
@@ -187,7 +190,8 @@ impl App {
             .ok_or("Could not find config directory")?
             .join("flow_state");
         let habits_data = HabitsData {
-            habits: self.habits.clone(),
+            build_habits: self.build_habits.clone(),
+            avoid_habits: self.avoid_habits.clone(),
         };
         let toml_string = toml::to_string(&habits_data)?;
         write(config_dir.join("habits.toml"), toml_string)?;
@@ -205,14 +209,15 @@ impl App {
         if habits_file.exists() {
             let content = read_to_string(habits_file)?;
             let habits_data: HabitsData = toml::from_str(&content)?;
-            self.habits = habits_data.habits;
+            self.build_habits = habits_data.build_habits;
+            self.avoid_habits = habits_data.avoid_habits;
         } else {
             self.populate_dummy_data();
         }
         Ok(())
     }
     fn populate_dummy_data(&mut self) {
-        self.habits = vec![
+        self.build_habits = vec![
             Habit {
                 name: "Morning run".to_string(),
                 habit_type: HabitType::Build,
@@ -225,6 +230,8 @@ impl App {
                 days_completed: HashSet::new(),
                 created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
             },
+        ];
+        self.avoid_habits = vec![
             Habit {
                 name: "Social media scrolling".to_string(),
                 habit_type: HabitType::Avoid,
@@ -240,13 +247,8 @@ impl App {
         ];
     }
     pub fn increment_habits_counter(&mut self) {
-        let build_len = self
-            .habits
-            .iter()
-            .filter(|habit| habit.habit_type == HabitType::Build)
-            .collect::<Vec<&Habit>>()
-            .len();
-        let avoid_len = self.habits.len() - build_len;
+        let build_len = self.build_habits.len();
+        let avoid_len = self.avoid_habits.len();
         if !self.counter.switch && self.counter.build_counter <= build_len {
             self.counter.build_counter += 1;
         }
@@ -260,12 +262,7 @@ impl App {
         self.counter.index += 1;
     }
     pub fn decrement_habits_counter(&mut self) {
-        let build_len = self
-            .habits
-            .iter()
-            .filter(|habit| habit.habit_type == HabitType::Build)
-            .collect::<Vec<&Habit>>()
-            .len();
+        let build_len = self.build_habits.len();
         if self.counter.switch && self.counter.avoid_counter > 0 {
             self.counter.avoid_counter -= 1;
         }
@@ -276,7 +273,6 @@ impl App {
         if !self.counter.switch && self.counter.build_counter > 0 {
             self.counter.build_counter -= 1;
         }
-        self.counter.index -= 1;
     }
     fn display_gauge(&self, progress: f32) -> String {
         let segments = [
@@ -297,7 +293,7 @@ impl App {
         format!("{} {:.1}%", segments[index], progress,)
     }
     pub fn check_todays_progress(&self, day: Day) -> String {
-        let length = self.habits.len();
+        let length = self.build_habits.len() + self.avoid_habits.len();
         if length == 0 {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, length);
         }
@@ -308,7 +304,12 @@ impl App {
         }
 
         let mut counter = 0;
-        for habit in self.habits.iter() {
+        for habit in self.build_habits.iter() {
+            if habit.days_completed.contains(&today) {
+                counter += 1;
+            }
+        }
+        for habit in self.avoid_habits.iter() {
             if habit.days_completed.contains(&today) {
                 counter += 1;
             }
@@ -317,7 +318,7 @@ impl App {
         format!("{}  ({}/{})", self.display_gauge(progress), counter, length)
     }
     pub fn check_weeks_progress(&self) -> String {
-        let total_habits = self.habits.len();
+        let total_habits = self.build_habits.len() + self.avoid_habits.len();
         if total_habits == 0 {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, 0);
         }
@@ -330,7 +331,12 @@ impl App {
         let mut counter = 0;
         for i in 0..7 {
             let check_date = week_start + Duration::days(i);
-            for j in self.habits.iter() {
+            for j in self.build_habits.iter() {
+                if j.days_completed.contains(&check_date) {
+                    counter += 1
+                }
+            }
+            for j in self.avoid_habits.iter() {
                 if j.days_completed.contains(&check_date) {
                     counter += 1
                 }
@@ -383,7 +389,7 @@ impl App {
     pub fn toggle_reset_mode(&mut self) {
         match self.screen_mode {
             ScreenMode::Reset => {}
-            _ => {self.screen_mode = ScreenMode::Reset}
+            _ => self.screen_mode = ScreenMode::Reset,
         }
     }
     pub fn toggle_day(&mut self) {
@@ -398,38 +404,70 @@ impl App {
             HabitType::Avoid => self.current_habit.habit_type = HabitType::Build,
         }
     }
-    pub fn edit_habit(&mut self, index: usize) {
-        self.habits[index].name = self.current_habit.name.clone();
-        self.habits[index].habit_type = self.current_habit.habit_type.clone();
+    pub fn edit_build_habit(&mut self, index: usize) {
+        self.build_habits[index].name = self.current_habit.name.clone();
+        self.build_habits[index].habit_type = self.current_habit.habit_type.clone();
+        self.toggle_normal_mode();
+    }
+    pub fn edit_avoid_habit(&mut self, index: usize) {
+        self.avoid_habits[index].name = self.current_habit.name.clone();
+        self.avoid_habits[index].habit_type = self.current_habit.habit_type.clone();
         self.toggle_normal_mode();
     }
     pub fn add_habit(&mut self) {
         self.current_habit.created = Utc::now().date_naive();
-        self.habits.push(self.current_habit.clone());
+        match self.current_habit.habit_type {
+            HabitType::Build => self.build_habits.push(self.current_habit.clone()),
+            HabitType::Avoid => self.avoid_habits.push(self.current_habit.clone()),
+        }
         self.toggle_normal_mode();
     }
-    pub fn find_best_habit(&self) -> Habit {
-        let mut best_score = self.habits[0].check_raw_pattern();
+    pub fn find_best_build_habit(&self) -> Habit {
+        let mut best_score = self.build_habits[0].check_raw_pattern();
         let mut best_index = 0;
-        for i in 1..self.habits.len() {
-            let score = self.habits[i].check_raw_pattern();
+        for i in 1..self.build_habits.len() {
+            let score = self.build_habits[i].check_raw_pattern();
             if best_score < score {
                 best_index = i;
                 best_score = score;
             }
         }
-        self.habits[best_index].clone()
+        self.build_habits[best_index].clone()
     }
-    pub fn find_worst_habit(&self) -> Habit {
-        let mut worst_score = self.habits[0].check_raw_pattern();
+    pub fn find_best_avoid_habit(&self) -> Habit {
+        let mut best_score = self.avoid_habits[0].check_raw_pattern();
+        let mut best_index = 0;
+        for i in 1..self.avoid_habits.len() {
+            let score = self.avoid_habits[i].check_raw_pattern();
+            if best_score < score {
+                best_index = i;
+                best_score = score;
+            }
+        }
+        self.avoid_habits[best_index].clone()
+    }
+    pub fn find_worst_build_habit(&self) -> Habit {
+        let mut worst_score = self.build_habits[0].check_raw_pattern();
         let mut worst_index = 0;
-        for i in 1..self.habits.len() {
-            let score = self.habits[i].check_raw_pattern();
+        for i in 1..self.build_habits.len() {
+            let score = self.build_habits[i].check_raw_pattern();
             if worst_score > score {
                 worst_score = score;
                 worst_index = i
             }
         }
-        self.habits[worst_index].clone()
+        self.build_habits[worst_index].clone()
+    }
+    pub fn find_worst_avoid_habit(&self) -> Habit {
+        let mut worst_score = self.avoid_habits[0].check_raw_pattern();
+        let mut worst_index = 0;
+        for i in 1..self.avoid_habits.len() {
+            let score = self.avoid_habits[i].check_raw_pattern();
+            if worst_score > score {
+                worst_score = score;
+                worst_index = i
+            }
+        }
+        self.avoid_habits[worst_index].clone()
     }
 }
