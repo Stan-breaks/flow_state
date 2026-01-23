@@ -85,7 +85,15 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                         },
                         KeyCode::Char('e') => match app.screen_mode {
                             ScreenMode::Normal => {
-                                app.toggle_edit_mode(app.habits[app.counter.index].clone());
+                                if !app.counter.switch {
+                                    app.toggle_edit_mode(
+                                        app.build_habits[app.counter.build_counter].clone(),
+                                    );
+                                } else {
+                                    app.toggle_edit_mode(
+                                        app.avoid_habits[app.counter.avoid_counter].clone(),
+                                    );
+                                }
                             }
                             _ => {}
                         },
@@ -93,16 +101,17 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                             app.toggle_day();
                         }
                         KeyCode::Enter | KeyCode::Char(' ') => {
-                            app.habits[app.counter.index].toggle_complete(app.current_day.clone());
+                            if !app.counter.switch {
+                                app.build_habits[app.counter.build_counter]
+                                    .toggle_complete(app.current_day.clone());
+                            } else {
+                                app.avoid_habits[app.counter.avoid_counter]
+                                    .toggle_complete(app.current_day.clone());
+                            }
                             app.save_habits().unwrap();
                         }
                         KeyCode::Char('d') => {
-                            if !app.counter.switch && app.counter.build_counter > 0 {
-                                app.toggle_delete_mode();
-                            }
-                            if app.counter.switch && app.counter.avoid_counter > 0 {
-                                app.toggle_delete_mode();
-                            }
+                            app.toggle_delete_mode();
                         }
                         _ => {}
                     },
@@ -129,7 +138,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                             app.current_habit.name.pop();
                         }
                         KeyCode::Enter => {
-                            app.edit_habit(app.counter.index);
+                            app.edit_habit();
                         }
                         KeyCode::Char(value) => {
                             app.current_habit.name.push(value);
@@ -138,7 +147,11 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                     },
                     ScreenMode::Deleting => match key.code {
                         KeyCode::Char('y') => {
-                            app.habits.remove(app.counter.index);
+                            if !app.counter.switch{
+                                app.build_habits.remove(app.counter.build_counter);
+                            }else{
+                                app.avoid_habits.remove(app.counter.build_counter);
+                            }
                             app.toggle_normal_mode();
                         }
                         KeyCode::Char('n') => {
@@ -148,7 +161,11 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre:
                     },
                     ScreenMode::Reset => match key.code {
                         KeyCode::Char('y') => {
-                            app.habits[app.counter.index].reset();
+                            if !app.counter.switch{
+                                app.build_habits[app.counter.build_counter].reset();
+                            }else{
+                                app.avoid_habits[app.counter.avoid_counter].reset();
+                            }
                             app.toggle_normal_mode();
                         }
                         KeyCode::Char('n') => {

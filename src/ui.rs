@@ -37,9 +37,9 @@ fn render_main_ui(chunks: &Rc<[Rect]>, frame: &mut Frame, app: &App) {
             edit_float_render(frame, area, app);
         }
         ScreenMode::Deleting => {
-            confirm_float(frame, area, app,"Confirm delete");
+            confirm_float(frame, area, app, "Confirm delete");
         }
-        ScreenMode::Reset =>{
+        ScreenMode::Reset => {
             confirm_float(frame, area, app, "Confirm reset");
         }
         _ => {}
@@ -107,25 +107,25 @@ fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
         .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
         .split(body_chunks[0]);
 
-    let total_len = app.habits.len();
+    let total_len = app.build_habits.len() + app.avoid_habits.len();
     let mastered_len = app
-        .habits
+        .build_habits
         .iter()
+        .chain(app.avoid_habits.iter())
         .filter(|h| h.check_pattern() == HabitPattern::Mastered)
-        .collect::<Vec<&Habit>>()
-        .len();
+        .count();
     let developing_len = app
-        .habits
+        .build_habits
         .iter()
+        .chain(app.avoid_habits.iter())
         .filter(|h| h.check_pattern() == HabitPattern::Developing)
-        .collect::<Vec<&Habit>>()
-        .len();
+        .count();
     let chaotic_len = app
-        .habits
+        .build_habits
         .iter()
+        .chain(app.avoid_habits.iter())
         .filter(|h| h.check_pattern() == HabitPattern::Chaotic)
-        .collect::<Vec<&Habit>>()
-        .len();
+        .count();
 
     let pattern_list = List::new([
         ListItem::new(Line::from(vec![
@@ -171,10 +171,20 @@ fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
 
     frame.render_widget(pattern_list, stat_chunks[0]);
 
-    let new = app.habits.iter().max_by_key(|h| h.created).unwrap();
-    let old = app.habits.iter().min_by_key(|h| h.created).unwrap();
-    let best = app.find_best_habit();
-    let worst = app.find_worst_habit();
+    let new = app
+        .build_habits
+        .iter()
+        .chain(app.avoid_habits.iter())
+        .max_by_key(|h| h.created)
+        .unwrap();
+    let old = app
+        .build_habits
+        .iter()
+        .chain(app.avoid_habits.iter())
+        .min_by_key(|h| h.created)
+        .unwrap();
+    let best = app.find_best_build_habit();
+    let worst = app.find_worst_avoid_habit();
 
     let maturity_list = List::new([
         ListItem::new(Line::from(vec![
@@ -214,13 +224,11 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
         .split(body_chunks[0]);
 
     let build_habit = List::new(
-        app.habits
+        app.build_habits
             .iter()
             .enumerate()
-            .filter(|(_, habit)| habit.habit_type == HabitType::Build)
-            .enumerate()
-            .map(|(display_idx, (_, habit))| {
-                if display_idx + 1 == app.counter.build_counter {
+            .map(|(display_idx, habit)| {
+                if display_idx  == app.counter.build_counter && !app.counter.switch {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
                         habit.check_status(app.current_day.clone()).emoji(),
@@ -228,7 +236,8 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                         habit.name,
                         habit.check_pattern().string()
                     ))
-                    .bg(Color::Green).fg(Color::Black)
+                    .bg(Color::Green)
+                    .fg(Color::Black)
                 } else {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
@@ -250,13 +259,11 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
     let build_len = build_habit.len();
     frame.render_widget(build_habit, habit_chucks[0]);
     let avoid_habit = List::new(
-        app.habits
+        app.avoid_habits
             .iter()
             .enumerate()
-            .filter(|(_, habit)| habit.habit_type == HabitType::Avoid)
-            .enumerate()
-            .map(|(display_idx, (_, habit))| {
-                if display_idx + 1 == app.counter.avoid_counter {
+            .map(| (display_idx, habit)| {
+                if display_idx  == app.counter.avoid_counter && app.counter.switch {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
                         habit.check_status(app.current_day.clone()).emoji(),
@@ -264,7 +271,8 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
                         habit.name,
                         habit.check_pattern().string()
                     ))
-                    .bg(Color::Red).fg(Color::Black)
+                    .bg(Color::Red)
+                    .fg(Color::Black)
                 } else {
                     ListItem::new(format!(
                         "{} [{}] {}  •  {}",
@@ -300,9 +308,13 @@ fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
 
     let stat_lines = vec![
         ListItem::new(
-            Line::from(format!("{}: {}", day_name, app.check_todays_progress(app.current_day.clone())))
-                .fg(Color::Green)
-                .centered(),
+            Line::from(format!(
+                "{}: {}",
+                day_name,
+                app.check_todays_progress(app.current_day.clone())
+            ))
+            .fg(Color::Green)
+            .centered(),
         ),
         ListItem::new(
             Line::from(format!("Week: {}", app.check_weeks_progress()))

@@ -12,7 +12,6 @@ pub enum CurrentScreen {
     Stats,
 }
 pub struct Counter {
-    pub index: usize,
     pub build_counter: usize,
     pub avoid_counter: usize,
     pub switch: bool,
@@ -163,7 +162,6 @@ impl App {
             build_habits: Vec::default(),
             avoid_habits: Vec::default(),
             counter: Counter {
-                index: 0,
                 build_counter: 0,
                 avoid_counter: 0,
                 switch: false,
@@ -247,31 +245,29 @@ impl App {
         ];
     }
     pub fn increment_habits_counter(&mut self) {
-        let build_len = self.build_habits.len();
-        let avoid_len = self.avoid_habits.len();
-        if !self.counter.switch && self.counter.build_counter <= build_len {
-            self.counter.build_counter += 1;
+        if !self.counter.switch {
+            if self.counter.build_counter + 1 < self.build_habits.len() {
+                self.counter.build_counter += 1;
+            } else {
+                self.counter.switch = true;
+            }
+        } else {
+            if self.counter.avoid_counter + 1 < self.avoid_habits.len() {
+                self.counter.avoid_counter += 1;
+            }
         }
-        if !self.counter.switch && self.counter.build_counter == build_len + 1 {
-            self.counter.switch = true;
-            self.counter.build_counter = 0;
-        }
-        if self.counter.switch && self.counter.avoid_counter < avoid_len {
-            self.counter.avoid_counter += 1;
-        }
-        self.counter.index += 1;
     }
     pub fn decrement_habits_counter(&mut self) {
-        let build_len = self.build_habits.len();
-        if self.counter.switch && self.counter.avoid_counter > 0 {
-            self.counter.avoid_counter -= 1;
-        }
-        if self.counter.switch && self.counter.avoid_counter == 0 {
-            self.counter.switch = false;
-            self.counter.build_counter = build_len + 1;
-        }
-        if !self.counter.switch && self.counter.build_counter > 0 {
-            self.counter.build_counter -= 1;
+        if self.counter.switch {
+            if self.counter.avoid_counter > 0 {
+                self.counter.avoid_counter -= 1;
+            } else {
+                self.counter.switch = false;
+            }
+        } else {
+            if self.counter.build_counter > 0 {
+                self.counter.build_counter -= 1
+            }
         }
     }
     fn display_gauge(&self, progress: f32) -> String {
@@ -404,19 +400,28 @@ impl App {
             HabitType::Avoid => self.current_habit.habit_type = HabitType::Build,
         }
     }
-    pub fn edit_build_habit(&mut self, index: usize) {
-        self.build_habits[index].name = self.current_habit.name.clone();
-        self.build_habits[index].habit_type = self.current_habit.habit_type.clone();
-        self.toggle_normal_mode();
-    }
-    pub fn edit_avoid_habit(&mut self, index: usize) {
-        self.avoid_habits[index].name = self.current_habit.name.clone();
-        self.avoid_habits[index].habit_type = self.current_habit.habit_type.clone();
+    pub fn edit_habit(&mut self) {
+        match (&self.counter.switch, &self.current_habit.habit_type) {
+            (false, HabitType::Build) => {
+                self.build_habits[self.counter.build_counter] = self.current_habit.clone();
+            }
+            (false, HabitType::Avoid) => {
+                self.build_habits.remove(self.counter.build_counter);
+                self.avoid_habits.push(self.current_habit.clone());
+            }
+            (true, HabitType::Build) => {
+                self.avoid_habits.remove(self.counter.avoid_counter);
+                self.build_habits.push(self.current_habit.clone());
+            }
+            (true, HabitType::Avoid) => {
+                self.avoid_habits[self.counter.avoid_counter] = self.current_habit.clone();
+            }
+        }
         self.toggle_normal_mode();
     }
     pub fn add_habit(&mut self) {
         self.current_habit.created = Utc::now().date_naive();
-        match self.current_habit.habit_type {
+        match &self.current_habit.habit_type {
             HabitType::Build => self.build_habits.push(self.current_habit.clone()),
             HabitType::Avoid => self.avoid_habits.push(self.current_habit.clone()),
         }
