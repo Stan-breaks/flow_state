@@ -1,16 +1,11 @@
 use crate::app::App;
 use crate::habit::HabitType;
 use ratatui::{
-    layout::{Alignment, Constraint, Direction, Layout, Position, Rect},
-    style::{Color, Stylize},
-    text::Line,
-    widgets::{Block, Borders, Clear, Paragraph},
-    Frame,
+    Frame, layout::{Alignment, Constraint, Direction, Layout, Position, Rect}, style::{Color, Style, Stylize}, text::Line, widgets::{Block, Borders, Clear, Paragraph}
 };
 
 use super::helpers::centered_rect;
 
-/// Unified form float for both "Add habit" and "Edit habit" screens.
 pub fn habit_form_float(frame: &mut Frame, area: Rect, app: &App, title: &str) {
     let popup_area = centered_rect(area, 60, 40);
     let popup_block = Block::default().borders(Borders::ALL).title(title);
@@ -69,7 +64,7 @@ pub fn confirm_float(frame: &mut Frame, area: Rect, app: &App, message: &str) {
         ])
         .split(inner_area);
 
-    let msg = Paragraph::new(message).fg(Color::Red).centered();
+    let msg = Paragraph::new(message).fg(Color::Red).centered().style(Style::default().bold());
     let habit_title = Paragraph::new(app.current_habit.name.as_str())
         .fg(Color::White)
         .centered();
