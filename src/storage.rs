@@ -1,13 +1,16 @@
 use std::{
     collections::HashSet,
-    error::Error,
     fs::{create_dir_all, read_to_string, write},
+    io,
 };
 
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
-use crate::habit::{Habit, HabitType};
+use crate::{
+    app::AppError,
+    habit::{Habit, HabitType},
+};
 
 #[derive(Serialize, Deserialize, Clone)]
 struct HabitsData {
@@ -15,13 +18,15 @@ struct HabitsData {
     avoid_habits: Vec<Habit>,
 }
 
-pub fn save_habits(
-    build_habits: &[Habit],
-    avoid_habits: &[Habit],
-) -> Result<(), Box<dyn Error>> {
-    let config_dir = dirs::config_dir()
-        .ok_or("Could not find config directory")?
-        .join("flow_state");
+pub fn save_habits(build_habits: &[Habit], avoid_habits: &[Habit]) -> Result<(), AppError> {
+    let config_dir = match dirs::config_dir() {
+        Some(path) => Ok(path.join("flow_state")),
+        None => Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            "config directory not found",
+        )),
+    }?;
+
     create_dir_all(&config_dir)?;
 
     let habits_data = HabitsData {
@@ -33,10 +38,11 @@ pub fn save_habits(
     Ok(())
 }
 
-pub fn load_habits() -> Result<(Vec<Habit>, Vec<Habit>), Box<dyn Error>> {
-    let config_dir = dirs::config_dir()
-        .ok_or("Could not find config directory")?
-        .join("flow_state");
+pub fn load_habits() -> Result<(Vec<Habit>, Vec<Habit>), AppError> {
+    let config_dir = match dirs::config_dir(){
+        Some(path)=>Ok(path.join("flow_state")) ,
+        None => Err(io::Error::new(io::ErrorKind::NotFound, "config directory not found"))
+    }?;
     create_dir_all(&config_dir)?;
 
     let habits_file = config_dir.join("habits.toml");

@@ -1,7 +1,50 @@
+use std::fmt::Display;
+use std::io;
+
 use chrono::{Datelike, Duration, Utc};
 
 use crate::habit::{Day, Habit, HabitType};
 use crate::storage;
+
+#[derive(Debug)]
+
+pub enum AppError {
+    Io(io::Error),
+    TomlSer(toml::ser::Error),
+    TomlDe(toml::de::Error)
+
+}
+
+
+impl From<io::Error> for AppError {
+    fn from(err: io::Error) -> Self {
+        AppError::Io(err)
+    }
+}
+
+impl From<toml::ser::Error> for AppError {
+    fn from(err: toml::ser::Error) -> Self {
+        AppError::TomlSer(err)
+    }
+}
+
+impl From<toml::de::Error> for AppError {
+    fn from(err: toml::de::Error) -> Self {
+        AppError::TomlDe(err)
+    }
+}
+
+impl Display for AppError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f,"IO error,{}",self);
+        match self {
+            AppError::Io(err) =>write!(f,"IO error,{}",err),
+            AppError::TomlSer(err) => write!(f,"Toml serialization error,{}",err),
+            AppError::TomlDe(err) => write!(f,"Toml deserialization error,{}",err),
+        }
+    }
+}
+
 
 pub enum CurrentScreen {
     Today,
@@ -56,14 +99,14 @@ impl App {
         }
     }
 
-    pub fn load_habits(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn load_habits(&mut self) -> Result<(),AppError> {
         let (build, avoid) = storage::load_habits()?;
         self.build_habits = build;
         self.avoid_habits = avoid;
         Ok(())
     }
 
-    pub fn save_habits(&self) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn save_habits(&self) -> Result<(), AppError> {
         storage::save_habits(&self.build_habits, &self.avoid_habits)
     }
 
@@ -178,13 +221,15 @@ impl App {
         if !self.counter.switch {
             self.build_habits.remove(self.counter.build_counter);
             // Adjust counter to stay in bounds
-            if self.counter.build_counter >= self.build_habits.len() && self.counter.build_counter > 0
+            if self.counter.build_counter >= self.build_habits.len()
+                && self.counter.build_counter > 0
             {
                 self.counter.build_counter -= 1;
             }
         } else {
             self.avoid_habits.remove(self.counter.avoid_counter);
-            if self.counter.avoid_counter >= self.avoid_habits.len() && self.counter.avoid_counter > 0
+            if self.counter.avoid_counter >= self.avoid_habits.len()
+                && self.counter.avoid_counter > 0
             {
                 self.counter.avoid_counter -= 1;
             }
