@@ -1,4 +1,4 @@
-use std::io;
+use std::io::{self, Result};
 
 use ratatui::{
     backend::CrosstermBackend,
@@ -18,24 +18,21 @@ mod ui;
 
 use crate::app::App;
 
-fn main() -> color_eyre::Result<()> {
-    // Setup terminal
+fn main() -> Result<()> {
+
     enable_raw_mode()?;
     let mut stderr = io::stderr();
     execute!(stderr, EnterAlternateScreen, EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stderr);
     let mut terminal = Terminal::new(backend)?;
 
-    // Create app and load data
     let mut app = App::new();
     if let Err(e) = app.load_habits() {
         eprintln!("Warning: Failed to load habits: {}", e);
     }
 
-    // Run the app
-    let res = input::run_app(&mut terminal, &mut app);
+    input::run_app(&mut terminal, &mut app)?;
 
-    // Restore terminal
     disable_raw_mode()?;
     execute!(
         terminal.backend_mut(),
@@ -44,5 +41,5 @@ fn main() -> color_eyre::Result<()> {
     )?;
     terminal.show_cursor()?;
 
-    res
+    Ok(())
 }
