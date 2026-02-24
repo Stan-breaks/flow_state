@@ -1,3 +1,5 @@
+use std::io::Result;
+
 use ratatui::{
     backend::Backend,
     crossterm::event::{self, Event, KeyCode},
@@ -6,7 +8,7 @@ use ratatui::{
 
 use crate::{app::{App, CurrentScreen, ScreenMode}, ui::ui};
 
-pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_eyre::Result<()> {
+pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> Result<()> {
     loop {
         terminal.draw(|f| ui(f, app))?;
 
@@ -15,12 +17,10 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_e
                 continue;
             }
 
-            // Global keys first (q to quit, Esc to cancel)
             if handle_global_keys(key.code, app) {
                 break;
             }
 
-            // Screen-specific keys
             match app.current_screen {
                 CurrentScreen::Today => handle_today_keys(key.code, app),
                 CurrentScreen::Stats => handle_stats_keys(key.code, app),
@@ -31,7 +31,6 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> color_e
     Ok(())
 }
 
-/// Handle global key bindings. Returns true if the app should quit.
 fn handle_global_keys(code: KeyCode, app: &mut App) -> bool {
     match code {
         KeyCode::Char('q') => {
@@ -87,7 +86,6 @@ fn handle_normal_mode(code: KeyCode, app: &mut App) {
     }
 }
 
-/// Shared handler for Adding and Editing text input modes.
 fn handle_text_input(code: KeyCode, app: &mut App, is_editing: bool) {
     match code {
         KeyCode::Tab => app.toggle_habit_type(),
@@ -108,7 +106,6 @@ fn handle_text_input(code: KeyCode, app: &mut App, is_editing: bool) {
     }
 }
 
-/// Shared handler for Deleting and Reset confirmation modes.
 fn handle_confirm(code: KeyCode, app: &mut App, is_delete: bool) {
     match code {
         KeyCode::Char('y') => {

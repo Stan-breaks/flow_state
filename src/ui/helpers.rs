@@ -2,7 +2,6 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
 };
 
-/// Create a centered rectangle within the given area using percentage-based sizing.
 pub fn centered_rect(area: Rect, width_pct: u16, height_pct: u16) -> Rect {
     let popup_layout = Layout::default()
         .direction(Direction::Vertical)
