@@ -34,8 +34,8 @@ pub enum HabitStatus {
 impl fmt::Display for HabitStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            HabitStatus::Complete => write!(f, "✅"),
-            HabitStatus::InComplete => write!(f, "⚪"),
+            HabitStatus::Complete => write!(f, "✔"),
+            HabitStatus::InComplete => write!(f, "✘"),
         }
     }
 }
@@ -52,11 +52,11 @@ pub enum HabitPattern {
 impl fmt::Display for HabitPattern {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            HabitPattern::Chaotic => write!(f, "Chaotic 🌪️"),
-            HabitPattern::Struggling => write!(f, "Struggling  😤"),
-            HabitPattern::Developing => write!(f, "Developing 🌱"),
-            HabitPattern::Established => write!(f, "Established ⚖️"),
-            HabitPattern::Mastered => write!(f, "Mastered 🎯"),
+            HabitPattern::Chaotic => write!(f, "Chaotic"),
+            HabitPattern::Struggling => write!(f, "Struggling"),
+            HabitPattern::Developing => write!(f, "Developing"),
+            HabitPattern::Established => write!(f, "Established"),
+            HabitPattern::Mastered => write!(f, "Mastered"),
         }
     }
 }
@@ -148,14 +148,10 @@ impl Habit {
 
 /// Find the habit with the highest raw pattern score from a slice.
 pub fn find_best_habit(habits: &[Habit]) -> Option<&Habit> {
-    habits
-        .iter()
-        .max_by_key(|h| h.check_raw_pattern())
+    habits.iter().max_by_key(|h| h.check_raw_pattern())
 }
 
 /// Find the habit with the lowest raw pattern score from a slice.
 pub fn find_worst_habit(habits: &[Habit]) -> Option<&Habit> {
-    habits
-        .iter()
-        .min_by_key(|h| h.check_raw_pattern())
+    habits.iter().min_by_key(|h| h.check_raw_pattern())
 }
