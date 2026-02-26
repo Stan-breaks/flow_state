@@ -2,9 +2,10 @@ use std::rc::Rc;
 
 use crate::app::App;
 use crate::habit::{Day, Habit};
+use ratatui::widgets::BorderType;
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
-    style::{Color, Style, Stylize},
+    style::{Color, Stylize},
     text::Line,
     widgets::{Block, Borders, List, ListItem},
     Frame,
@@ -12,7 +13,7 @@ use ratatui::{
 
 pub fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
     let habit_chunks = Layout::default()
-        .direction(Direction::Vertical)
+        .direction(Direction::Horizontal)
         .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
         .split(body_chunks[0]);
 
@@ -73,8 +74,8 @@ fn render_habit_list<'a>(
     List::new(items).block(
         Block::default()
             .borders(Borders::ALL)
+            .border_type(BorderType::Rounded)
             .title(title)
-            .border_style(Style::default().fg(color)),
     )
 }
 

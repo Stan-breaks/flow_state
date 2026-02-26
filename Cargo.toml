@@ -15,7 +15,6 @@ keywords = ["habit", "tracker", "ratatui", "terminal", "cli"]
 
 [dependencies]
 chrono = { version = "0.4.41", features = ["serde"] }
-color-eyre = "0.6.5"
 crossterm = "0.29.0"
 dirs = "6.0.0"
 ratatui = "0.29.0"
