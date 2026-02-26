@@ -1,7 +1,7 @@
 use crate::app::{App, CurrentScreen};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
-    style::{ Color, Modifier, Style, Stylize},
+    style::{Color, Modifier, Style, Stylize},
     text::Line,
     widgets::{Block, BorderType, Borders, List, ListItem, Paragraph},
     Frame,
