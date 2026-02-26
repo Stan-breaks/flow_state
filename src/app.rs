@@ -11,10 +11,8 @@ use crate::storage;
 pub enum AppError {
     Io(io::Error),
     TomlSer(toml::ser::Error),
-    TomlDe(toml::de::Error)
-
+    TomlDe(toml::de::Error),
 }
-
 
 impl From<io::Error> for AppError {
     fn from(err: io::Error) -> Self {
@@ -36,15 +34,14 @@ impl From<toml::de::Error> for AppError {
 
 impl Display for AppError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"IO error,{}",self);
+        write!(f, "IO error,{}", self);
         match self {
-            AppError::Io(err) =>write!(f,"IO error,{}",err),
-            AppError::TomlSer(err) => write!(f,"Toml serialization error,{}",err),
-            AppError::TomlDe(err) => write!(f,"Toml deserialization error,{}",err),
+            AppError::Io(err) => write!(f, "IO error,{}", err),
+            AppError::TomlSer(err) => write!(f, "Toml serialization error,{}", err),
+            AppError::TomlDe(err) => write!(f, "Toml deserialization error,{}", err),
         }
     }
 }
-
 
 pub enum CurrentScreen {
     Today,
@@ -99,7 +96,7 @@ impl App {
         }
     }
 
-    pub fn load_habits(&mut self) -> Result<(),AppError> {
+    pub fn load_habits(&mut self) -> Result<(), AppError> {
         let (build, avoid) = storage::load_habits()?;
         self.build_habits = build;
         self.avoid_habits = avoid;
@@ -164,15 +161,27 @@ impl App {
         }
     }
 
+    pub fn toggle_build_habits(&mut self) {
+        if self.counter.switch {
+            self.counter.switch = !self.counter.switch;
+        }
+    }
+
+    pub fn toggle_avoid_habit(&mut self) {
+        if !self.counter.switch {
+            self.counter.switch = !self.counter.switch;
+        }
+    }
+
     pub fn increment_habits_counter(&mut self) {
         if !self.counter.switch {
             if self.counter.build_counter + 1 < self.build_habits.len() {
                 self.counter.build_counter += 1;
-            } else if !self.avoid_habits.is_empty() {
-                self.counter.switch = true;
             }
-        } else if self.counter.avoid_counter + 1 < self.avoid_habits.len() {
-            self.counter.avoid_counter += 1;
+        } else {
+            if self.counter.avoid_counter + 1 < self.avoid_habits.len() {
+                self.counter.avoid_counter += 1;
+            }
         }
     }
 
@@ -180,11 +189,11 @@ impl App {
         if self.counter.switch {
             if self.counter.avoid_counter > 0 {
                 self.counter.avoid_counter -= 1;
-            } else if !self.build_habits.is_empty() {
-                self.counter.switch = false;
             }
-        } else if self.counter.build_counter > 0 {
-            self.counter.build_counter -= 1;
+        } else {
+            if self.counter.build_counter > 0 {
+                self.counter.build_counter -= 1;
+            }
         }
     }
 

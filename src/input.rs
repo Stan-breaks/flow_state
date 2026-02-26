@@ -70,6 +70,8 @@ fn handle_normal_mode(code: KeyCode, app: &mut App) {
         KeyCode::Tab => app.toggle_page(),
         KeyCode::Char('j') | KeyCode::Down => app.increment_habits_counter(),
         KeyCode::Char('k') | KeyCode::Up => app.decrement_habits_counter(),
+        KeyCode::Char('h') | KeyCode::Left => app.toggle_build_habits(),
+        KeyCode::Char('l') | KeyCode::Right => app.toggle_avoid_habit(),
         KeyCode::Char('a') => app.toggle_add_mode(),
         KeyCode::Char('e') => {
             let habit = app.get_selected_habit();

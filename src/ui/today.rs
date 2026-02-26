@@ -22,11 +22,9 @@ pub fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) 
         &app.current_day,
         app.counter.build_counter,
         !app.counter.switch,
-        0,
         "🌟 Build These Habits",
         Color::Green,
     );
-    let build_len = app.build_habits.len();
     frame.render_widget(build_habit_list, habit_chunks[0]);
 
     let avoid_habit_list = render_habit_list(
@@ -34,7 +32,6 @@ pub fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) 
         &app.current_day,
         app.counter.avoid_counter,
         app.counter.switch,
-        build_len,
         "🚫 Avoid These Habits",
         Color::Red,
     );
@@ -48,7 +45,6 @@ fn render_habit_list<'a>(
     current_day: &Day,
     selected_index: usize,
     is_active: bool,
-    index_offset: usize,
     title: &'a str,
     color: Color,
 ) -> List<'a> {
@@ -59,7 +55,7 @@ fn render_habit_list<'a>(
             let text = format!(
                 "{} [{}] {}  •  {}",
                 habit.check_status(current_day),
-                idx + index_offset + 1,
+                idx + 1,
                 habit.name,
                 habit.check_pattern()
             );
@@ -75,18 +71,15 @@ fn render_habit_list<'a>(
         Block::default()
             .borders(Borders::ALL)
             .border_type(BorderType::Rounded)
-            .title(title)
+            .title(title),
     )
 }
 
 fn render_footer(area: Rect, frame: &mut Frame, app: &App) {
-    let footer_block = Block::default().borders(Borders::ALL);
-    frame.render_widget(&footer_block, area);
-
     let inner_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Min(1), Constraint::Min(1)])
-        .split(footer_block.inner(area));
+        .split(area);
 
     let day_name = app.current_day.as_str();
 
@@ -97,28 +90,35 @@ fn render_footer(area: Rect, frame: &mut Frame, app: &App) {
                 day_name,
                 app.check_todays_progress(&app.current_day)
             ))
-            .fg(Color::Green)
             .centered(),
         ),
-        ListItem::new(
-            Line::from(format!("Week: {}", app.check_weeks_progress()))
-                .fg(Color::Green)
-                .centered(),
-        ),
+        ListItem::new(Line::from(format!("Week: {}", app.check_weeks_progress())).centered()),
     ];
-    frame.render_widget(List::new(stat_lines), inner_chunks[0]);
+    frame.render_widget(
+        List::new(stat_lines).block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded),
+        ),
+        inner_chunks[0],
+    );
 
     let hint_lines = vec![
         ListItem::new(
             Line::from("[Enter]/[Space] Toggle Habits • [↑↓]/[jk] Navigate • [r] reset habit")
-                .fg(Color::Green)
                 .centered(),
         ),
         ListItem::new(
             Line::from("[a] Add • [e] Edit • [d] Delete • [y] Switch Day • [TAB] Switch Views ")
-                .fg(Color::Green)
                 .centered(),
         ),
     ];
-    frame.render_widget(List::new(hint_lines), inner_chunks[1]);
+    frame.render_widget(
+        List::new(hint_lines).block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_type(BorderType::Rounded),
+        ),
+        inner_chunks[1],
+    );
 }
