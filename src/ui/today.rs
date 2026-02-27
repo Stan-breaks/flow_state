@@ -78,7 +78,11 @@ fn render_habit_list<'a>(
 fn render_footer(area: Rect, frame: &mut Frame, app: &App) {
     let inner_chunks = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints([Constraint::Min(1), Constraint::Min(1)])
+        .constraints([
+            Constraint::Percentage(25),
+            Constraint::Percentage(50),
+            Constraint::Percentage(25),
+        ])
         .split(area);
 
     let day_name = app.current_day.as_str();
@@ -96,25 +100,6 @@ fn render_footer(area: Rect, frame: &mut Frame, app: &App) {
     ];
     frame.render_widget(
         List::new(stat_lines).block(
-            Block::default()
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded),
-        ),
-        inner_chunks[0],
-    );
-
-    let hint_lines = vec![
-        ListItem::new(
-            Line::from("[Enter]/[Space] Toggle Habits • [↑↓]/[jk] Navigate • [r] reset habit")
-                .centered(),
-        ),
-        ListItem::new(
-            Line::from("[a] Add • [e] Edit • [d] Delete • [y] Switch Day • [TAB] Switch Views ")
-                .centered(),
-        ),
-    ];
-    frame.render_widget(
-        List::new(hint_lines).block(
             Block::default()
                 .borders(Borders::ALL)
                 .border_type(BorderType::Rounded),
