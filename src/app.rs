@@ -1,3 +1,4 @@
+use std::cmp::max;
 use std::fmt::Display;
 use std::io;
 
@@ -34,7 +35,7 @@ impl From<toml::de::Error> for AppError {
 
 impl Display for AppError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "IO error,{}", self);
+        write!(f, "IO error,{}", self)?;
         match self {
             AppError::Io(err) => write!(f, "IO error,{}", err),
             AppError::TomlSer(err) => write!(f, "Toml serialization error,{}", err),
@@ -350,5 +351,32 @@ impl App {
             completed,
             total_possible
         )
+    }
+    pub fn get_heatmap_years(&self) -> Vec<String> {
+        let mut min = 3000;
+        let mut max = 2000;
+        for i in &self.build_habits {
+            let year = i.created.year();
+            if year > max {
+                max = year;
+            }
+            if year < min {
+                min = year;
+            }
+        }
+        for i in &self.avoid_habits {
+            let year = i.created.year();
+            if year > max {
+                max = year;
+            }
+            if year < min {
+                min = year;
+            }
+        }
+        if min == max {
+            vec![min.to_string()]
+        } else {
+            (min..max).map(|i| i.to_string()).collect()
+        }
     }
 }
