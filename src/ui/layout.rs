@@ -7,9 +7,9 @@ use ratatui::{
     Frame,
 };
 
-//use super::heatmap::render_heatmap_page;
 use super::stats::render_stats_page;
 use super::today::render_today_page;
+use super::heatmap::render_heatmap_page;
 
 pub fn render_title(chunk: Rect, frame: &mut Frame) {
     let title_items = vec![
@@ -83,6 +83,6 @@ pub fn render_body(chunk: Rect, frame: &mut Frame, app: &App) {
     match app.current_screen {
         CurrentScreen::Today => render_today_page(body_chunks, frame, app),
         CurrentScreen::Stats => render_stats_page(body_chunks, frame, app),
-        CurrentScreen::Heatmap => {}
+        CurrentScreen::Heatmap => render_heatmap_page(body_chunks, frame, app),
     }
 }

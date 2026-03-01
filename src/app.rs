@@ -61,6 +61,7 @@ pub enum ScreenMode {
 pub struct Counter {
     pub build_counter: usize,
     pub avoid_counter: usize,
+    pub year_counter: usize,
     pub switch: bool,
 }
 
@@ -69,6 +70,7 @@ impl Default for Counter {
         Counter {
             build_counter: 0,
             avoid_counter: 0,
+            year_counter: 0,
             switch: false,
         }
     }
@@ -77,6 +79,7 @@ impl Default for Counter {
 pub struct App {
     pub build_habits: Vec<Habit>,
     pub avoid_habits: Vec<Habit>,
+    pub years: Vec<String>,
     pub counter: Counter,
     pub current_screen: CurrentScreen,
     pub screen_mode: ScreenMode,
@@ -89,6 +92,7 @@ impl App {
         App {
             build_habits: Vec::new(),
             avoid_habits: Vec::new(),
+            years: Vec::new(),
             counter: Counter::default(),
             current_screen: CurrentScreen::Today,
             screen_mode: ScreenMode::Normal,
@@ -101,6 +105,7 @@ impl App {
         let (build, avoid) = storage::load_habits()?;
         self.build_habits = build;
         self.avoid_habits = avoid;
+        self.years = self.get_heatmap_years();
         Ok(())
     }
 
@@ -195,6 +200,17 @@ impl App {
             if self.counter.build_counter > 0 {
                 self.counter.build_counter -= 1;
             }
+        }
+    }
+    pub fn increment_year_counter(&mut self) {
+        if self.counter.year_counter + 1 < self.years.len() {
+            self.counter.year_counter += 1;
+        }
+    }
+
+    pub fn decrement_year_counter(&mut self) {
+        if self.counter.year_counter > 0 {
+            self.counter.year_counter -= 1;
         }
     }
 
@@ -376,7 +392,7 @@ impl App {
         if min == max {
             vec![min.to_string()]
         } else {
-            (min..max).map(|i| i.to_string()).collect()
+            (min..max + 1).map(|i| i.to_string()).collect()
         }
     }
 }
