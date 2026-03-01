@@ -24,7 +24,7 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> Result<
             match app.current_screen {
                 CurrentScreen::Today => handle_today_keys(key.code, app),
                 CurrentScreen::Stats => handle_stats_keys(key.code, app),
-                CurrentScreen::Heatmap => handle_stats_keys(key.code, app),
+                CurrentScreen::Heatmap => handle_heatmap_keys(key.code, app),
             }
         }
     }
@@ -62,6 +62,15 @@ fn handle_today_keys(code: KeyCode, app: &mut App) {
 fn handle_stats_keys(code: KeyCode, app: &mut App) {
     if let KeyCode::Tab = code {
         app.toggle_page();
+    }
+}
+
+fn handle_heatmap_keys(code: KeyCode, app: &mut App) {
+    match code {
+        KeyCode::Tab => app.toggle_page(),
+        KeyCode::Char('j')|KeyCode::Down =>app.increment_year_counter(),
+        KeyCode::Char('k')|KeyCode::Up => app.decrement_year_counter(),
+        _=>{}
     }
 }
 
