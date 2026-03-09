@@ -1,9 +1,9 @@
 # Flow State
 
 A terminal-based habit tracker designed for neurodivergent users. Focuses on progress patterns rather than perfect streaks.
-
-![home screen image](assets/image2.png)
-![heatmap image](assets/image1.png)
+| | |
+|---|---|
+| ![home screen image](assets/image2.png) | ![heatmap image](assets/image1.png) |
 
 ## Features
 
