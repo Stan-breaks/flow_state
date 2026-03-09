@@ -1,4 +1,3 @@
-use std::cmp::max;
 use std::fmt::Display;
 use std::io;
 
