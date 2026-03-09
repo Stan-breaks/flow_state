@@ -6,7 +6,10 @@ use ratatui::{
     Terminal,
 };
 
-use crate::{app::{App, CurrentScreen, ScreenMode}, ui::ui};
+use crate::{
+    app::{App, CurrentScreen, ScreenMode},
+    ui::ui,
+};
 
 pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> Result<()> {
     loop {
@@ -42,6 +45,9 @@ fn handle_global_keys(code: KeyCode, app: &mut App) -> bool {
         KeyCode::Esc => {
             if !matches!(app.screen_mode, ScreenMode::Normal) {
                 app.toggle_normal_mode();
+            } else {
+                let _ = app.save_habits();
+                return true;
             }
         }
         _ => {}
@@ -68,9 +74,9 @@ fn handle_stats_keys(code: KeyCode, app: &mut App) {
 fn handle_heatmap_keys(code: KeyCode, app: &mut App) {
     match code {
         KeyCode::Tab => app.toggle_page(),
-        KeyCode::Char('j')|KeyCode::Down =>app.increment_year_counter(),
-        KeyCode::Char('k')|KeyCode::Up => app.decrement_year_counter(),
-        _=>{}
+        KeyCode::Char('j') | KeyCode::Down => app.increment_year_counter(),
+        KeyCode::Char('k') | KeyCode::Up => app.decrement_year_counter(),
+        _ => {}
     }
 }
 
