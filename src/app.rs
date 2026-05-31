@@ -1,5 +1,6 @@
 use std::fmt::Display;
 use std::io;
+use std::sync::{Arc, Mutex};
 
 use chrono::{Datelike, Duration, Utc};
 
@@ -57,6 +58,41 @@ pub enum ScreenMode {
     Reset,
 }
 
+#[derive(Clone)]
+pub struct Notif {
+    pub done: usize,
+    pub total: usize,
+}
+
+impl Default for Notif {
+    fn default() -> Self {
+        Notif {
+            done: 0,
+            total: 0,
+        }
+    }
+}
+
+impl Notif {
+    pub fn get_percent(&self) -> f32 {
+        if self.total == 0 {
+            return 100.0;
+        }
+        return 100.0 * (self.done as f32) / (self.total as f32);
+    }
+
+    pub fn get_notification_text(&self) -> String {
+        let progress = self.get_percent();
+        if progress <= 20.0 {
+            return String::from("Have you checked your habit tracker today? No tasks have been done.");
+        } else if progress >= 80.0 {
+            return String::from("You've done nearly all your tasks today, well done!");
+        } else {
+            return String::from("");
+        }
+    }
+}
+
 pub struct Counter {
     pub build_counter: usize,
     pub avoid_counter: usize,
@@ -84,6 +120,7 @@ pub struct App {
     pub screen_mode: ScreenMode,
     pub current_habit: Habit,
     pub current_day: Day,
+    pub notif: Arc<Mutex<Notif>>,
 }
 
 impl App {
@@ -97,6 +134,7 @@ impl App {
             screen_mode: ScreenMode::Normal,
             current_day: Day::Today,
             current_habit: Habit::default(),
+            notif: Arc::new(Mutex::new(Notif::default())),
         }
     }
 
@@ -306,6 +344,7 @@ impl App {
     }
 
     fn display_gauge(&self, progress: f32) -> String {
+        self.set_todays_progress();
         let segments = [
             "▱▱▱▱▱▱▱▱▱▱", // 0%
             "▰▱▱▱▱▱▱▱▱▱", // 10%
@@ -323,12 +362,23 @@ impl App {
         format!("{} {:.1}%", segments[index], progress)
     }
 
+    pub fn set_todays_progress(&self) {
+        let total = self.build_habits.len() + self.avoid_habits.len();
+        let date = Day::Today.resolve_date();
+        let completed = self.count_completed_on(date);
+
+        {
+            let mut notif = self.notif.lock().unwrap();
+            (*notif).done = completed;
+            (*notif).total = total;
+        }
+    }
+
     pub fn check_todays_progress(&self, day: &Day) -> String {
         let total = self.build_habits.len() + self.avoid_habits.len();
         if total == 0 {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, total);
         }
-
         let date = day.resolve_date();
         let completed = self.count_completed_on(date);
         let progress = (completed as f32 / total as f32) * 100.0;
@@ -339,7 +389,7 @@ impl App {
             total
         )
     }
-
+    
     pub fn check_weeks_progress(&self) -> String {
         let total_habits = self.build_habits.len() + self.avoid_habits.len();
         if total_habits == 0 {
