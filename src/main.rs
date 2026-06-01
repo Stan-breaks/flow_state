@@ -57,7 +57,7 @@ fn main() -> Result<()> {
             let schedule = Schedule::from_str(&expression).unwrap();
             let mut iterator = schedule.upcoming(Local).peekable();
             loop {
-                thread::sleep(Duration::from_secs(1));
+                thread::sleep(Duration::from_secs(30));
                 notifications::check_notification_trigger(app_clone.lock().unwrap().clone(), &mut iterator);
             }
         });
