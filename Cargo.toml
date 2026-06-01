@@ -22,3 +22,4 @@ serde = { version = "1.0.219", features = ["derive"] }
 toml = "0.8.23"
 notify-rust = "4.17.0"
 cron = "0.16.0"
+zbus = "5.16.0"

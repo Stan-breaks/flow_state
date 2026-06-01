@@ -12,6 +12,7 @@ A terminal-based habit tracker designed for neurodivergent users. Focuses on pro
 - **Dual habit types**: Track habits to build and habits to avoid
 - **Minimal interface**: Keyboard-driven with essential information only
 - **Local storage**: All data stored locally using TOML files
+- **Optional notifications**: Made to avoid alert fatigue while still providing a reminder
 
 ## Design Philosophy
 
@@ -97,7 +98,6 @@ Contributions welcome, especially from neurodivergent developers who understand 
 - ADHD-friendly UX enhancements
 - Performance optimizations
 - Cross-platform compatibility
-
 
 ## Acknowledgments
 

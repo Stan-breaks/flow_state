@@ -5,7 +5,7 @@ use std::sync::{Arc, Mutex};
 use chrono::{Datelike, Duration, Utc};
 
 use crate::habit::{Day, Habit, HabitType};
-use crate::storage;
+use crate::storage::{self, NotificationSettings};
 
 #[derive(Debug)]
 
@@ -59,21 +59,25 @@ pub enum ScreenMode {
 }
 
 #[derive(Clone)]
-pub struct Notif {
+pub struct NotificationData {
     pub done: usize,
     pub total: usize,
+    pub low_threshold: usize,
+    pub high_threshold: usize,
 }
 
-impl Default for Notif {
+impl Default for NotificationData {
     fn default() -> Self {
-        Notif {
+        NotificationData {
             done: 0,
             total: 0,
+            low_threshold: 20,
+            high_threshold: 80,
         }
     }
 }
 
-impl Notif {
+impl NotificationData {
     pub fn get_percent(&self) -> f32 {
         if self.total == 0 {
             return 100.0;
@@ -83,9 +87,9 @@ impl Notif {
 
     pub fn get_notification_text(&self) -> String {
         let progress = self.get_percent();
-        if progress <= 20.0 {
-            return String::from("Have you checked your habit tracker today? No tasks have been done.");
-        } else if progress >= 80.0 {
+        if progress <= self.low_threshold as f32 {
+            return String::from("Have you checked your habit tracker today? Very few tasks have been done.");
+        } else if progress >= self.high_threshold as f32 {
             return String::from("You've done nearly all your tasks today, well done!");
         } else {
             return String::from("");
@@ -120,7 +124,7 @@ pub struct App {
     pub screen_mode: ScreenMode,
     pub current_habit: Habit,
     pub current_day: Day,
-    pub notif: Arc<Mutex<Notif>>,
+    pub notif: Arc<Mutex<NotificationData>>,
 }
 
 impl App {
@@ -134,8 +138,14 @@ impl App {
             screen_mode: ScreenMode::Normal,
             current_day: Day::Today,
             current_habit: Habit::default(),
-            notif: Arc::new(Mutex::new(Notif::default())),
+            notif: Arc::new(Mutex::new(NotificationData::default())),
         }
+    }
+
+    pub fn set_notifications(&mut self, settings: NotificationSettings) {
+        let mut notif = self.notif.lock().unwrap();
+        (*notif).low_threshold = settings.low_threshold;
+        (*notif).high_threshold = settings.high_threshold;
     }
 
     pub fn load_habits(&mut self) -> Result<(), AppError> {
@@ -344,7 +354,6 @@ impl App {
     }
 
     fn display_gauge(&self, progress: f32) -> String {
-        self.set_todays_progress();
         let segments = [
             "▱▱▱▱▱▱▱▱▱▱", // 0%
             "▰▱▱▱▱▱▱▱▱▱", // 10%
@@ -362,7 +371,7 @@ impl App {
         format!("{} {:.1}%", segments[index], progress)
     }
 
-    pub fn set_todays_progress(&self) {
+    pub fn set_notification(&self) {
         let total = self.build_habits.len() + self.avoid_habits.len();
         let date = Day::Today.resolve_date();
         let completed = self.count_completed_on(date);
@@ -376,6 +385,7 @@ impl App {
 
     pub fn check_todays_progress(&self, day: &Day) -> String {
         let total = self.build_habits.len() + self.avoid_habits.len();
+        self.set_notification();
         if total == 0 {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, total);
         }
@@ -396,6 +406,7 @@ impl App {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, 0);
         }
 
+        self.set_notification();
         let today = Utc::now();
         let date = today.date_naive();
         let days_since_monday = today.weekday().num_days_from_monday();

@@ -13,6 +13,15 @@ use crate::{
 };
 
 #[derive(Serialize, Deserialize, Clone)]
+pub struct NotificationSettings {
+    pub enable: bool,
+    pub hour: usize,
+    pub minute: usize,
+    pub low_threshold: usize,
+    pub high_threshold: usize,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
 struct HabitsData {
     build_habits: Vec<Habit>,
     avoid_habits: Vec<Habit>,
@@ -86,4 +95,31 @@ fn populate_dummy_data() -> (Vec<Habit>, Vec<Habit>) {
         },
     ];
     (build_habits, avoid_habits)
+}
+
+pub fn load_notification_settings() -> Result<NotificationSettings, AppError> {
+    let config_dir = match dirs::config_dir(){
+        Some(path)=>Ok(path.join("flow_state")) ,
+        None => Err(io::Error::new(io::ErrorKind::NotFound, "config directory not found"))
+    }?;
+
+    let notification_file = config_dir.join("notification.toml");
+
+    if notification_file.exists() {
+        let content = read_to_string(notification_file)?;
+        let notification_data: NotificationSettings = toml::from_str(&content)?;
+        Ok(notification_data)
+    } else {
+        Ok(default_notification_settings())
+    }
+}
+
+fn default_notification_settings() -> NotificationSettings {
+    NotificationSettings {
+        enable: false,
+        hour: 0,
+        minute: 0,
+        low_threshold: 20,
+        high_threshold: 80,
+    }
 }
