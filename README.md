@@ -34,6 +34,28 @@ Instead of streaks, Flow State tracks weekly patterns.
 - **Struggling** (2): Frequent relapse
 - **Chaotic** (1): Inconsistent
 
+## Notification system
+
+Notifications are a double-edged sword for people with ADHD - we need them to avoid forgetting important things, but 
+when we're juggling multiple tasks in a busy life, they tend to overwhelm our neurodivergent brains.
+
+That's why the notification system in flow_state is designed to avoid throwing useless data at you. In the config
+file `.config/flow_state/notification.toml`, you can set up a daily reminder. This reminder will fire at a time
+defined by keys `hour` and `minute`, once a day. But it will only fire in two circumstances:
+- when you've forgotten to check your tracker entirely, a non-judgmental message will remind you to take a look.
+  This is going to fire only when your task completion percentage is under a set threshold `low_threshold`.
+- when you've done exceptionally well, a cheering message will give you some encouragement for knocking it out of
+  the park. This is as a reward counterbalance to the reminder message. This will fire when your task completion is
+  above `high_threshold`.
+
+As a result, there will be no alerts on most days you actually check off things on the tracker, when your
+completion isn't near zero or near perfect. But you will receive a single reminder if you've forgotten to look at your
+tasks, and some well-deserved congrats for doing well.
+
+Neurodivergent-friendly defaults for notifications are in example file `config/notification.toml`. Without this file with
+key `enable` set to `true`, the notifications are off - before enabling them, make sure they are useful for your
+particular neurodivergent brain.
+
 ## Installation
 
 ```bash

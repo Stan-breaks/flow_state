@@ -1,13 +1,17 @@
+# Put this in ~/.config/flow_state/notification.toml
+
 # people with ADHD should be careful with notifications. 
 # That's why this can fire only once a day.
 # Enable with caution.
 enable = true
+
 # To avoid alert fatigue, it's best to not always have
 # the notification pop. It should only fire if you
 # completely forgot to check the tracker.
 # The low threshold value is the percentage of done tasks
-# below which it will fire at.
-low_threshold = 20
+# at or below which it will fire at.
+low_threshold = 10
+
 # To balance out the annoying alert when you don't do well,
 # you might want to have a 'reward' mechanism alert. This
 # isn't a streak - so don't be discouraged if you don't get it! -
@@ -15,7 +19,8 @@ low_threshold = 20
 # when you're really knocking it out of the park.
 # This high threshold value is the percentage of done tasks
 # above which it will fire. Good job!
-high_threshold = 90
+high_threshold = 80
+
 # hour to notify at
 hour = 20
 # minute to notify at
