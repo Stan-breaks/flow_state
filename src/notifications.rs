@@ -4,7 +4,44 @@ use notify_rust::Notification;
 use cron::ScheduleIterator;
 use std::iter::Peekable;
 
-use crate::app::NotificationData;
+#[derive(Clone)]
+pub struct NotificationData {
+    pub done: usize,
+    pub total: usize,
+    pub low_threshold: usize,
+    pub high_threshold: usize,
+}
+
+impl Default for NotificationData {
+    fn default() -> Self {
+        NotificationData {
+            done: 0,
+            total: 0,
+            low_threshold: 20,
+            high_threshold: 80,
+        }
+    }
+}
+
+impl NotificationData {
+    pub fn get_percent(&self) -> f32 {
+        if self.total == 0 {
+            return 100.0;
+        }
+        return 100.0 * (self.done as f32) / (self.total as f32);
+    }
+
+    pub fn get_notification_text(&self) -> String {
+        let progress = self.get_percent();
+        if progress <= self.low_threshold as f32 {
+            return String::from("I know you're busy, but make sure to check your habit tracker today!");
+        } else if progress >= self.high_threshold as f32 {
+            return String::from("You've done nearly all your tasks today, well done!");
+        } else {
+            return String::from("");
+        }
+    }
+}
 
 pub fn check_notification_trigger(count: NotificationData, iter: &mut Peekable<ScheduleIterator<'_, Local>>) {
     let datetime = iter.peek();

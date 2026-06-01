@@ -6,6 +6,7 @@ use chrono::{Datelike, Duration, Utc};
 
 use crate::habit::{Day, Habit, HabitType};
 use crate::storage::{self, NotificationSettings};
+use crate::notifications::NotificationData;
 
 #[derive(Debug)]
 
@@ -58,44 +59,6 @@ pub enum ScreenMode {
     Reset,
 }
 
-#[derive(Clone)]
-pub struct NotificationData {
-    pub done: usize,
-    pub total: usize,
-    pub low_threshold: usize,
-    pub high_threshold: usize,
-}
-
-impl Default for NotificationData {
-    fn default() -> Self {
-        NotificationData {
-            done: 0,
-            total: 0,
-            low_threshold: 20,
-            high_threshold: 80,
-        }
-    }
-}
-
-impl NotificationData {
-    pub fn get_percent(&self) -> f32 {
-        if self.total == 0 {
-            return 100.0;
-        }
-        return 100.0 * (self.done as f32) / (self.total as f32);
-    }
-
-    pub fn get_notification_text(&self) -> String {
-        let progress = self.get_percent();
-        if progress <= self.low_threshold as f32 {
-            return String::from("Have you checked your habit tracker today? Very few tasks have been done.");
-        } else if progress >= self.high_threshold as f32 {
-            return String::from("You've done nearly all your tasks today, well done!");
-        } else {
-            return String::from("");
-        }
-    }
-}
 
 pub struct Counter {
     pub build_counter: usize,
