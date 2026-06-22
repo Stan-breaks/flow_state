@@ -1,10 +1,12 @@
 use std::fmt::Display;
 use std::io;
+use std::sync::{Arc, Mutex};
 
 use chrono::{Datelike, Duration, Utc};
 
 use crate::habit::{Day, Habit, HabitType};
-use crate::storage;
+use crate::storage::{self, NotificationSettings};
+use crate::notifications::NotificationData;
 
 #[derive(Debug)]
 
@@ -57,6 +59,7 @@ pub enum ScreenMode {
     Reset,
 }
 
+
 pub struct Counter {
     pub build_counter: usize,
     pub avoid_counter: usize,
@@ -84,6 +87,7 @@ pub struct App {
     pub screen_mode: ScreenMode,
     pub current_habit: Habit,
     pub current_day: Day,
+    pub notif: Arc<Mutex<NotificationData>>,
 }
 
 impl App {
@@ -97,7 +101,14 @@ impl App {
             screen_mode: ScreenMode::Normal,
             current_day: Day::Today,
             current_habit: Habit::default(),
+            notif: Arc::new(Mutex::new(NotificationData::default())),
         }
+    }
+
+    pub fn set_notifications(&mut self, settings: NotificationSettings) {
+        let mut notif = self.notif.lock().unwrap();
+        (*notif).low_threshold = settings.low_threshold;
+        (*notif).high_threshold = settings.high_threshold;
     }
 
     pub fn load_habits(&mut self) -> Result<(), AppError> {
@@ -323,12 +334,24 @@ impl App {
         format!("{} {:.1}%", segments[index], progress)
     }
 
+    pub fn set_notification(&self) {
+        let total = self.build_habits.len() + self.avoid_habits.len();
+        let date = Day::Today.resolve_date();
+        let completed = self.count_completed_on(date);
+
+        {
+            let mut notif = self.notif.lock().unwrap();
+            (*notif).done = completed;
+            (*notif).total = total;
+        }
+    }
+
     pub fn check_todays_progress(&self, day: &Day) -> String {
         let total = self.build_habits.len() + self.avoid_habits.len();
+        self.set_notification();
         if total == 0 {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, total);
         }
-
         let date = day.resolve_date();
         let completed = self.count_completed_on(date);
         let progress = (completed as f32 / total as f32) * 100.0;
@@ -339,13 +362,14 @@ impl App {
             total
         )
     }
-
+    
     pub fn check_weeks_progress(&self) -> String {
         let total_habits = self.build_habits.len() + self.avoid_habits.len();
         if total_habits == 0 {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, 0);
         }
 
+        self.set_notification();
         let today = Utc::now();
         let date = today.date_naive();
         let days_since_monday = today.weekday().num_days_from_monday();
