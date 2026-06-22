@@ -26,7 +26,7 @@
       packages."x86_64-linux".default = pkgs.rustPlatform.buildRustPackage {
         name = "flow_state";
         src = ./.;
-        cargoHash = "sha256-udJerd8ojnqPu2GcwLnhuKTYWsh2vMqJejayjaq3IHY=";
+        cargoHash = "sha256-geEEjP/sDqOlsHDqCXK0R6Yu3sho6T0ErkoJey4ZYiM=";
       };
     };
 }
