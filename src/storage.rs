@@ -19,6 +19,10 @@ pub struct NotificationSettings {
     pub minute: usize,
     pub low_threshold: usize,
     pub high_threshold: usize,
+    /// Hours past midnight that still count as "yesterday" (e.g. 2 lets a
+    /// night owl's day run until 2am). 0 = day resets at local midnight.
+    #[serde(default)]
+    pub day_cutoff_hour: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -125,5 +129,6 @@ fn default_notification_settings() -> NotificationSettings {
         minute: 0,
         low_threshold: 20,
         high_threshold: 80,
+        day_cutoff_hour: 0,
     }
 }

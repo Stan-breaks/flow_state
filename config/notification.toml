@@ -25,3 +25,8 @@ high_threshold = 80
 hour = 20
 # minute to notify at
 minute = 0
+
+# Hours past midnight that still count as "yesterday". Night owl? Set this to
+# 2 and your day won't roll over until 2am local time. 0 = day resets at
+# midnight (default).
+day_cutoff_hour = 0

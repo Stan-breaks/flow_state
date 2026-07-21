@@ -24,6 +24,7 @@ pub fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) 
         !app.counter.switch,
         "🌟 Build These Habits",
         Color::Green,
+        app.day_cutoff_hour,
     );
     frame.render_widget(build_habit_list, habit_chunks[0]);
 
@@ -34,6 +35,7 @@ pub fn render_today_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) 
         app.counter.switch,
         "🚫 Avoid These Habits",
         Color::Red,
+        app.day_cutoff_hour,
     );
     frame.render_widget(avoid_habit_list, habit_chunks[1]);
 
@@ -47,23 +49,24 @@ fn render_habit_list<'a>(
     is_active: bool,
     title: &'a str,
     color: Color,
+    cutoff_hour: u32,
 ) -> List<'a> {
     let items: Vec<ListItem> = habits
         .iter()
         .enumerate()
         .map(|(idx, habit)| {
-            let holiday_tag = if habit.is_on_holiday(current_day.resolve_date()) {
+            let holiday_tag = if habit.is_on_holiday(current_day.resolve_date(cutoff_hour)) {
                 " 🌴"
             } else {
                 ""
             };
             let text = format!(
                 "{} [{}] {}{}  •  {}",
-                habit.check_status(current_day),
+                habit.check_status(current_day, cutoff_hour),
                 idx + 1,
                 habit.name,
                 holiday_tag,
-                habit.check_pattern()
+                habit.check_pattern(cutoff_hour)
             );
             if idx == selected_index && is_active {
                 ListItem::new(text).bg(color).fg(Color::Black)

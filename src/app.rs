@@ -2,9 +2,9 @@ use std::fmt::Display;
 use std::io;
 use std::sync::{Arc, Mutex};
 
-use chrono::{Datelike, Duration, NaiveDate, Utc};
+use chrono::{Datelike, Duration, NaiveDate};
 
-use crate::habit::{Day, Habit, HabitType};
+use crate::habit::{today_with_cutoff, Day, Habit, HabitType};
 use crate::storage::{self, NotificationSettings};
 use crate::notifications::NotificationData;
 
@@ -107,6 +107,7 @@ pub struct App {
     pub current_day: Day,
     pub notif: Arc<Mutex<NotificationData>>,
     pub holiday_input: HolidayInput,
+    pub day_cutoff_hour: u32,
 }
 
 impl App {
@@ -122,10 +123,12 @@ impl App {
             current_habit: Habit::default(),
             notif: Arc::new(Mutex::new(NotificationData::default())),
             holiday_input: HolidayInput::default(),
+            day_cutoff_hour: 0,
         }
     }
 
     pub fn set_notifications(&mut self, settings: NotificationSettings) {
+        self.day_cutoff_hour = settings.day_cutoff_hour.min(23);
         let mut notif = self.notif.lock().unwrap();
         (*notif).low_threshold = settings.low_threshold;
         (*notif).high_threshold = settings.high_threshold;
@@ -300,7 +303,7 @@ impl App {
     }
 
     pub fn add_habit(&mut self) {
-        self.current_habit.created = Utc::now().date_naive();
+        self.current_habit.created = today_with_cutoff(self.day_cutoff_hour);
         match self.current_habit.habit_type {
             HabitType::Build => self.build_habits.push(self.current_habit.clone()),
             HabitType::Avoid => self.avoid_habits.push(self.current_habit.clone()),
@@ -350,18 +353,20 @@ impl App {
 
     pub fn reset_current_habit(&mut self) {
         if !self.counter.switch {
-            self.build_habits[self.counter.build_counter].reset();
+            self.build_habits[self.counter.build_counter].reset(self.day_cutoff_hour);
         } else {
-            self.avoid_habits[self.counter.avoid_counter].reset();
+            self.avoid_habits[self.counter.avoid_counter].reset(self.day_cutoff_hour);
         }
         self.toggle_normal_mode();
     }
 
     pub fn toggle_current_habit(&mut self) {
         if !self.counter.switch {
-            self.build_habits[self.counter.build_counter].toggle_complete(&self.current_day);
+            self.build_habits[self.counter.build_counter]
+                .toggle_complete(&self.current_day, self.day_cutoff_hour);
         } else {
-            self.avoid_habits[self.counter.avoid_counter].toggle_complete(&self.current_day);
+            self.avoid_habits[self.counter.avoid_counter]
+                .toggle_complete(&self.current_day, self.day_cutoff_hour);
         }
     }
 
@@ -411,7 +416,7 @@ impl App {
 
     pub fn set_notification(&self) {
         let total = self.build_habits.len() + self.avoid_habits.len();
-        let date = Day::Today.resolve_date();
+        let date = Day::Today.resolve_date(self.day_cutoff_hour);
         let completed = self.count_completed_on(date);
 
         {
@@ -427,7 +432,7 @@ impl App {
         if total == 0 {
             return format!("{}  ({}/{})", self.display_gauge(0.0), 0, total);
         }
-        let date = day.resolve_date();
+        let date = day.resolve_date(self.day_cutoff_hour);
         let completed = self.count_completed_on(date);
         let progress = (completed as f32 / total as f32) * 100.0;
         format!(
@@ -437,7 +442,7 @@ impl App {
             total
         )
     }
-
+    
     pub fn check_weeks_progress(&self) -> String {
         let total_habits = self.build_habits.len() + self.avoid_habits.len();
         if total_habits == 0 {
@@ -445,9 +450,8 @@ impl App {
         }
 
         self.set_notification();
-        let today = Utc::now();
-        let date = today.date_naive();
-        let days_since_monday = today.weekday().num_days_from_monday();
+        let date = today_with_cutoff(self.day_cutoff_hour);
+        let days_since_monday = date.weekday().num_days_from_monday();
         let week_start = date - Duration::days(days_since_monday as i64);
 
         let total_possible = total_habits * 7;

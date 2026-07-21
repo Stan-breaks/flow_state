@@ -24,9 +24,9 @@ pub fn render_stats_page(body_chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) 
         .cloned()
         .collect();
 
-    render_pattern_health(stat_chunks[0], frame, &all_habits);
-    render_habit_spotlight(stat_chunks[1], frame, &all_habits);
-    render_encouragement(body_chunks[1], frame, &all_habits);
+    render_pattern_health(stat_chunks[0], frame, &all_habits, app.day_cutoff_hour);
+    render_habit_spotlight(stat_chunks[1], frame, &all_habits, app.day_cutoff_hour);
+    render_encouragement(body_chunks[1], frame, &all_habits, app.day_cutoff_hour);
 }
 
 const TIERS: [(HabitPattern, &str, Color); 5] = [
@@ -37,7 +37,7 @@ const TIERS: [(HabitPattern, &str, Color); 5] = [
     (HabitPattern::Mastered, "Mastered", Color::Green),
 ];
 
-fn render_pattern_health(area: Rect, frame: &mut Frame, habits: &[Habit]) {
+fn render_pattern_health(area: Rect, frame: &mut Frame, habits: &[Habit], cutoff_hour: u32) {
     let block = Block::default()
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded)
@@ -63,7 +63,7 @@ fn render_pattern_health(area: Rect, frame: &mut Frame, habits: &[Habit]) {
 
     let total = habits.len() as f32;
     for (i, (pattern, label, color)) in TIERS.iter().enumerate() {
-        let count = habits.iter().filter(|h| h.check_pattern() == *pattern).count();
+        let count = habits.iter().filter(|h| h.check_pattern(cutoff_hour) == *pattern).count();
         let pct = (count as f32 / total * 100.0).round() as u16;
         let gauge = Gauge::default()
             .gauge_style(Style::default().fg(*color))
@@ -73,7 +73,7 @@ fn render_pattern_health(area: Rect, frame: &mut Frame, habits: &[Habit]) {
     }
 }
 
-fn render_habit_spotlight(area: Rect, frame: &mut Frame, habits: &[Habit]) {
+fn render_habit_spotlight(area: Rect, frame: &mut Frame, habits: &[Habit], cutoff_hour: u32) {
     let block = Block::default()
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded)
@@ -93,8 +93,8 @@ fn render_habit_spotlight(area: Rect, frame: &mut Frame, habits: &[Habit]) {
     frame.render_widget(block, area);
 
     let newest = habits.iter().max_by_key(|h| h.created).unwrap();
-    let thriving = find_best_habit(habits).unwrap();
-    let growing_edge = find_worst_habit(habits).unwrap();
+    let thriving = find_best_habit(habits, cutoff_hour).unwrap();
+    let growing_edge = find_worst_habit(habits, cutoff_hour).unwrap();
 
     let lines = [
         Line::from(format!("🌊  New: {}", newest.name)).fg(Color::White),
@@ -105,13 +105,13 @@ fn render_habit_spotlight(area: Rect, frame: &mut Frame, habits: &[Habit]) {
     frame.render_widget(Paragraph::new(lines.to_vec()), inner);
 }
 
-fn render_encouragement(area: Rect, frame: &mut Frame, habits: &[Habit]) {
+fn render_encouragement(area: Rect, frame: &mut Frame, habits: &[Habit], cutoff_hour: u32) {
     let (message, color) = if habits.is_empty() {
         ("Add a habit whenever you're ready — no rush", Color::LightYellow)
     } else {
         let strong = habits
             .iter()
-            .filter(|h| matches!(h.check_pattern(), HabitPattern::Established | HabitPattern::Mastered))
+            .filter(|h| matches!(h.check_pattern(cutoff_hour), HabitPattern::Established | HabitPattern::Mastered))
             .count();
         let ratio = strong as f32 / habits.len() as f32;
         if ratio >= 0.6 {

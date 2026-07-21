@@ -1,7 +1,13 @@
 use std::{collections::HashSet, fmt};
 
-use chrono::{Duration, NaiveDate, Utc};
+use chrono::{Duration, Local, NaiveDate};
 use serde::{Deserialize, Serialize};
+
+/// "Today" shifted by `cutoff_hour` hours, so a habit's day can run past
+/// midnight for users whose day doesn't end there.
+pub fn today_with_cutoff(cutoff_hour: u32) -> NaiveDate {
+    (Local::now().naive_local() - Duration::hours(cutoff_hour as i64)).date()
+}
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub enum Day {
@@ -17,8 +23,8 @@ impl Day {
         }
     }
 
-    pub fn resolve_date(&self) -> NaiveDate {
-        let today = Utc::now().date_naive();
+    pub fn resolve_date(&self, cutoff_hour: u32) -> NaiveDate {
+        let today = today_with_cutoff(cutoff_hour);
         match self {
             Day::Today => today,
             Day::Yesterday => today - Duration::days(1),
@@ -102,8 +108,8 @@ impl Default for Habit {
 }
 
 impl Habit {
-    pub fn check_status(&self, day: &Day) -> HabitStatus {
-        let date = day.resolve_date();
+    pub fn check_status(&self, day: &Day, cutoff_hour: u32) -> HabitStatus {
+        let date = day.resolve_date(cutoff_hour);
         if self.days_completed.contains(&date) {
             HabitStatus::Complete
         } else {
@@ -111,16 +117,16 @@ impl Habit {
         }
     }
 
-    pub fn toggle_complete(&mut self, day: &Day) {
-        let date = day.resolve_date();
+    pub fn toggle_complete(&mut self, day: &Day, cutoff_hour: u32) {
+        let date = day.resolve_date(cutoff_hour);
         if !self.days_completed.insert(date) {
             self.days_completed.remove(&date);
         }
     }
 
-    pub fn reset(&mut self) {
+    pub fn reset(&mut self, cutoff_hour: u32) {
         self.days_completed.clear();
-        self.created = Utc::now().date_naive();
+        self.created = today_with_cutoff(cutoff_hour);
     }
 
     pub fn add_holiday(&mut self, start: NaiveDate, end: NaiveDate) {
@@ -134,8 +140,8 @@ impl Habit {
 
     /// Holiday days already elapsed, clipped to [created, today] so future or
     /// pre-creation holiday entries can't inflate the count.
-    fn holiday_days_elapsed(&self) -> i64 {
-        let today = Utc::now().date_naive();
+    fn holiday_days_elapsed(&self, cutoff_hour: u32) -> i64 {
+        let today = today_with_cutoff(cutoff_hour);
         self.holidays
             .iter()
             .map(|h| {
@@ -150,24 +156,23 @@ impl Habit {
             .sum()
     }
 
-    fn days_since_creation(&self) -> i64 {
-        let raw_days = Utc::now()
-            .date_naive()
+    fn days_since_creation(&self, cutoff_hour: u32) -> i64 {
+        let raw_days = today_with_cutoff(cutoff_hour)
             .signed_duration_since(self.created)
             .num_days();
-        (raw_days - self.holiday_days_elapsed()).max(1)
+        (raw_days - self.holiday_days_elapsed(cutoff_hour)).max(1)
     }
 
-    pub fn check_raw_pattern(&self) -> i32 {
-        let days = self.days_since_creation();
+    pub fn check_raw_pattern(&self, cutoff_hour: u32) -> i32 {
+        let days = self.days_since_creation(cutoff_hour);
         let check_ins = self.days_completed.len();
         ((check_ins as f32 / days as f32 * 5.0).round() as i32)
             .max(0)
             .min(5)
     }
 
-    pub fn check_pattern(&self) -> HabitPattern {
-        let days = self.days_since_creation();
+    pub fn check_pattern(&self, cutoff_hour: u32) -> HabitPattern {
+        let days = self.days_since_creation(cutoff_hour);
         let check_ins = self.days_completed.len();
         let pattern = ((check_ins as f32 / days as f32 * 5.0).round() as u32)
             .max(1)
@@ -189,11 +194,11 @@ impl Habit {
 }
 
 /// Find the habit with the highest raw pattern score from a slice.
-pub fn find_best_habit(habits: &[Habit]) -> Option<&Habit> {
-    habits.iter().max_by_key(|h| h.check_raw_pattern())
+pub fn find_best_habit(habits: &[Habit], cutoff_hour: u32) -> Option<&Habit> {
+    habits.iter().max_by_key(|h| h.check_raw_pattern(cutoff_hour))
 }
 
 /// Find the habit with the lowest raw pattern score from a slice.
-pub fn find_worst_habit(habits: &[Habit]) -> Option<&Habit> {
-    habits.iter().min_by_key(|h| h.check_raw_pattern())
+pub fn find_worst_habit(habits: &[Habit], cutoff_hour: u32) -> Option<&Habit> {
+    habits.iter().min_by_key(|h| h.check_raw_pattern(cutoff_hour))
 }
