@@ -57,6 +57,7 @@ pub enum ScreenMode {
     Deleting,
     Reset,
     Holiday,
+    Help,
 }
 
 pub struct HolidayInput {
@@ -174,6 +175,14 @@ impl App {
         if let ScreenMode::Normal = self.screen_mode {
             self.screen_mode = ScreenMode::Editing;
             self.current_habit = habit;
+        }
+    }
+
+    pub fn toggle_help_mode(&mut self) {
+        match self.screen_mode {
+            ScreenMode::Normal => self.screen_mode = ScreenMode::Help,
+            ScreenMode::Help => self.screen_mode = ScreenMode::Normal,
+            _ => {}
         }
     }
 

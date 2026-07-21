@@ -50,6 +50,11 @@ fn handle_global_keys(code: KeyCode, app: &mut App) -> bool {
                 return true;
             }
         }
+        KeyCode::Char('?') => {
+            if matches!(app.screen_mode, ScreenMode::Normal | ScreenMode::Help) {
+                app.toggle_help_mode();
+            }
+        }
         _ => {}
     }
     false
@@ -63,6 +68,7 @@ fn handle_today_keys(code: KeyCode, app: &mut App) {
         ScreenMode::Deleting => handle_confirm(code, app, true),
         ScreenMode::Reset => handle_confirm(code, app, false),
         ScreenMode::Holiday => handle_holiday_input(code, app),
+        ScreenMode::Help => {}
     }
 }
 

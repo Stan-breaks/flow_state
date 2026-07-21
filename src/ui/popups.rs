@@ -2,13 +2,86 @@ use crate::app::App;
 use crate::habit::HabitType;
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Position, Rect},
-    style::{Color, Style, Stylize},
-    text::Line,
-    widgets::{Block, BorderType, Borders, Clear, Padding, Paragraph},
+    style::{Color, Modifier, Style, Stylize},
+    text::{Line, Span},
+    widgets::{Block, BorderType, Borders, Clear, List, ListItem, Padding, Paragraph},
     Frame,
 };
 
 use super::helpers::centered_rect;
+
+pub fn help_popup(frame: &mut Frame, area: Rect) {
+    let popup_area = centered_rect(area, 62, 78);
+    let popup_block = Block::default()
+        .borders(Borders::ALL)
+        .border_type(BorderType::Rounded)
+        .title("⌨  Keymaps")
+        .padding(Padding::proportional(1));
+    let inner_area = popup_block.inner(popup_area);
+
+    let main_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Min(1), Constraint::Length(1)])
+        .split(inner_area);
+
+    let sections: [(&str, &[(&str, &str)]); 5] = [
+        (
+            "Global",
+            &[
+                ("q / Esc", "Quit (Esc closes a popup first)"),
+                ("Tab", "Switch view: Today → Stats → Heatmap"),
+                ("?", "Toggle this help"),
+            ],
+        ),
+        (
+            "Today",
+            &[
+                ("j/k, ↓/↑", "Move selection"),
+                ("h/l, ←/→", "Switch Build / Avoid column"),
+                ("Enter, Space", "Toggle habit for current day"),
+                ("y", "Edit yesterday instead of today"),
+                ("a", "Add habit"),
+                ("e", "Edit selected habit"),
+                ("d", "Delete selected habit"),
+                ("r", "Reset selected habit"),
+                ("H", "Mark holiday range for selected habit"),
+            ],
+        ),
+        (
+            "Add / Edit habit",
+            &[("Tab", "Switch Build / Avoid"), ("Enter", "Save"), ("Esc", "Cancel")],
+        ),
+        (
+            "Holiday form",
+            &[("Tab", "Switch Start / End field"), ("Enter", "Save"), ("Esc", "Cancel")],
+        ),
+        (
+            "Delete / Reset confirm",
+            &[("y", "Confirm"), ("n, Esc", "Cancel")],
+        ),
+    ];
+
+    let mut items: Vec<ListItem> = Vec::new();
+    for (title, keys) in sections {
+        items.push(ListItem::new(Line::from(Span::styled(
+            title,
+            Style::default().fg(Color::LightYellow).add_modifier(Modifier::BOLD),
+        ))));
+        for (key, action) in keys {
+            items.push(ListItem::new(Line::from(vec![
+                Span::styled(format!("  {key:<14}"), Style::default().fg(Color::Cyan)),
+                Span::raw(*action),
+            ])));
+        }
+    }
+
+    frame.render_widget(Clear, popup_area);
+    frame.render_widget(popup_block, popup_area);
+    frame.render_widget(List::new(items), main_chunks[0]);
+
+    let footer = Paragraph::new("? or Esc to close").centered().fg(Color::LightYellow);
+    frame.render_widget(footer, main_chunks[1]);
+}
 
 pub fn habit_form_float(frame: &mut Frame, area: Rect, app: &App, title: &str) {
     let popup_area = centered_rect(area, 50, 40);

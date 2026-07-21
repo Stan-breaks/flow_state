@@ -7,7 +7,7 @@ mod today;
 
 use crate::app::App;
 use layout::{render_body, render_tab, render_title};
-use popups::{confirm_float, habit_form_float, holiday_form_float};
+use popups::{confirm_float, habit_form_float, help_popup, holiday_form_float};
 use ratatui::{
     layout::{Constraint, Direction, Layout},
     Frame,
@@ -36,6 +36,7 @@ pub fn ui(frame: &mut Frame, app: &App) {
         ScreenMode::Deleting => confirm_float(frame, area, app, "Confirm delete"),
         ScreenMode::Reset => confirm_float(frame, area, app, "Confirm reset"),
         ScreenMode::Holiday => holiday_form_float(frame, area, app),
-        _ => {}
+        ScreenMode::Help => help_popup(frame, area),
+        ScreenMode::Normal => {}
     }
 }

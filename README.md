@@ -58,6 +58,7 @@ flow_state
 | `y` | Edit yesterday instead of today |
 | `H` | Mark a holiday range for the selected habit |
 | `hjkl` | Navigate |
+| `?` | Show all keymaps |
 | `q` | Quit |
 
 ## Notifications
