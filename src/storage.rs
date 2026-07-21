@@ -72,12 +72,14 @@ fn populate_dummy_data() -> (Vec<Habit>, Vec<Habit>) {
             habit_type: HabitType::Build,
             days_completed: HashSet::new(),
             created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
+            holidays: Vec::new(),
         },
         Habit {
             name: "Read 10 pages".to_string(),
             habit_type: HabitType::Build,
             days_completed: HashSet::new(),
             created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
+            holidays: Vec::new(),
         },
     ];
     let avoid_habits = vec![
@@ -86,12 +88,14 @@ fn populate_dummy_data() -> (Vec<Habit>, Vec<Habit>) {
             habit_type: HabitType::Avoid,
             days_completed: HashSet::new(),
             created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
+            holidays: Vec::new(),
         },
         Habit {
             name: "Late-night snacking".to_string(),
             habit_type: HabitType::Avoid,
             days_completed: HashSet::new(),
             created: NaiveDate::from_ymd_opt(2025, 06, 12).unwrap(),
+            holidays: Vec::new(),
         },
     ];
     (build_habits, avoid_habits)

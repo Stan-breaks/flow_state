@@ -63,6 +63,66 @@ pub fn habit_form_float(frame: &mut Frame, area: Rect, app: &App, title: &str) {
     frame.set_cursor_position(position);
 }
 
+pub fn holiday_form_float(frame: &mut Frame, area: Rect, app: &App) {
+    let popup_area = centered_rect(area, 50, 45);
+    let title = format!("🌴 Holiday — {}", app.current_habit.name);
+    let popup_block = Block::default()
+        .borders(Borders::ALL)
+        .title(title)
+        .border_type(BorderType::Rounded)
+        .padding(Padding::proportional(1));
+    let inner_area = popup_block.inner(popup_area);
+
+    let main_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(3),
+            Constraint::Length(3),
+            Constraint::Min(1),
+            Constraint::Length(1),
+        ])
+        .split(inner_area);
+
+    let field_block = |title: &'static str, focused: bool| {
+        Block::default()
+            .borders(Borders::ALL)
+            .border_type(BorderType::Rounded)
+            .title(title)
+            .fg(if focused { Color::Yellow } else { Color::default() })
+    };
+
+    let start_input = Paragraph::new(app.holiday_input.start.as_str())
+        .block(field_block("Start (YYYY-MM-DD):", !app.holiday_input.focus_end));
+    let end_input = Paragraph::new(app.holiday_input.end.as_str())
+        .block(field_block("End (YYYY-MM-DD):", app.holiday_input.focus_end));
+
+    let hint = Paragraph::new("Missed days in this range won't count against your pattern")
+        .fg(Color::LightYellow)
+        .centered();
+
+    frame.render_widget(Clear, popup_area);
+    frame.render_widget(popup_block, popup_area);
+    frame.render_widget(start_input, main_chunks[0]);
+    frame.render_widget(end_input, main_chunks[1]);
+    frame.render_widget(hint, main_chunks[2]);
+
+    if let Some(error) = &app.holiday_input.error {
+        let error_msg = Paragraph::new(error.as_str()).fg(Color::Red).centered();
+        frame.render_widget(error_msg, main_chunks[3]);
+    } else {
+        let footer_hint = Paragraph::new("Tab switch field · Enter save").centered();
+        frame.render_widget(footer_hint, main_chunks[3]);
+    }
+
+    let (field_area, text_len) = if app.holiday_input.focus_end {
+        (main_chunks[1], app.holiday_input.end.len())
+    } else {
+        (main_chunks[0], app.holiday_input.start.len())
+    };
+    let position = Position::new(field_area.x + text_len as u16 + 1, field_area.y + 1);
+    frame.set_cursor_position(position);
+}
+
 pub fn confirm_float(frame: &mut Frame, area: Rect, app: &App, message: &str) {
     let popup_area = centered_rect(area, 35, 35);
     let popup_block = Block::default()

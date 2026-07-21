@@ -52,11 +52,17 @@ fn render_habit_list<'a>(
         .iter()
         .enumerate()
         .map(|(idx, habit)| {
+            let holiday_tag = if habit.is_on_holiday(current_day.resolve_date()) {
+                " 🌴"
+            } else {
+                ""
+            };
             let text = format!(
-                "{} [{}] {}  •  {}",
+                "{} [{}] {}{}  •  {}",
                 habit.check_status(current_day),
                 idx + 1,
                 habit.name,
+                holiday_tag,
                 habit.check_pattern()
             );
             if idx == selected_index && is_active {

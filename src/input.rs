@@ -62,6 +62,7 @@ fn handle_today_keys(code: KeyCode, app: &mut App) {
         ScreenMode::Editing => handle_text_input(code, app, true),
         ScreenMode::Deleting => handle_confirm(code, app, true),
         ScreenMode::Reset => handle_confirm(code, app, false),
+        ScreenMode::Holiday => handle_holiday_input(code, app),
     }
 }
 
@@ -94,6 +95,10 @@ fn handle_normal_mode(code: KeyCode, app: &mut App) {
         }
         KeyCode::Char('d') => app.toggle_delete_mode(),
         KeyCode::Char('r') => app.toggle_reset_mode(),
+        KeyCode::Char('H') => {
+            let habit = app.get_selected_habit();
+            app.toggle_holiday_mode(habit);
+        }
         KeyCode::Char('y') => app.toggle_day(),
         KeyCode::Enter | KeyCode::Char(' ') => {
             app.toggle_current_habit();
@@ -119,6 +124,16 @@ fn handle_text_input(code: KeyCode, app: &mut App, is_editing: bool) {
         KeyCode::Char(value) => {
             app.current_habit.name.push(value);
         }
+        _ => {}
+    }
+}
+
+fn handle_holiday_input(code: KeyCode, app: &mut App) {
+    match code {
+        KeyCode::Tab => app.toggle_holiday_focus(),
+        KeyCode::Backspace => app.pop_holiday_char(),
+        KeyCode::Enter => app.add_holiday(),
+        KeyCode::Char(value) => app.push_holiday_char(value),
         _ => {}
     }
 }

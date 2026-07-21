@@ -68,11 +68,25 @@ pub enum HabitType {
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq)]
+pub struct HolidayRange {
+    pub start: NaiveDate,
+    pub end: NaiveDate,
+}
+
+impl HolidayRange {
+    fn contains(&self, date: NaiveDate) -> bool {
+        date >= self.start && date <= self.end
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq)]
 pub struct Habit {
     pub name: String,
     pub habit_type: HabitType,
     pub days_completed: HashSet<NaiveDate>,
     pub created: NaiveDate,
+    #[serde(default)]
+    pub holidays: Vec<HolidayRange>,
 }
 
 impl Default for Habit {
@@ -82,6 +96,7 @@ impl Default for Habit {
             habit_type: HabitType::Build,
             days_completed: HashSet::default(),
             created: NaiveDate::default(),
+            holidays: Vec::new(),
         }
     }
 }
@@ -108,12 +123,39 @@ impl Habit {
         self.created = Utc::now().date_naive();
     }
 
+    pub fn add_holiday(&mut self, start: NaiveDate, end: NaiveDate) {
+        let (start, end) = if start <= end { (start, end) } else { (end, start) };
+        self.holidays.push(HolidayRange { start, end });
+    }
+
+    pub fn is_on_holiday(&self, date: NaiveDate) -> bool {
+        self.holidays.iter().any(|h| h.contains(date))
+    }
+
+    /// Holiday days already elapsed, clipped to [created, today] so future or
+    /// pre-creation holiday entries can't inflate the count.
+    fn holiday_days_elapsed(&self) -> i64 {
+        let today = Utc::now().date_naive();
+        self.holidays
+            .iter()
+            .map(|h| {
+                let start = h.start.max(self.created);
+                let end = h.end.min(today);
+                if end >= start {
+                    (end - start).num_days() + 1
+                } else {
+                    0
+                }
+            })
+            .sum()
+    }
+
     fn days_since_creation(&self) -> i64 {
-        Utc::now()
+        let raw_days = Utc::now()
             .date_naive()
             .signed_duration_since(self.created)
-            .num_days()
-            .max(1)
+            .num_days();
+        (raw_days - self.holiday_days_elapsed()).max(1)
     }
 
     pub fn check_raw_pattern(&self) -> i32 {

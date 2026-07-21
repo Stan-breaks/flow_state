@@ -2,7 +2,7 @@ use std::fmt::Display;
 use std::io;
 use std::sync::{Arc, Mutex};
 
-use chrono::{Datelike, Duration, Utc};
+use chrono::{Datelike, Duration, NaiveDate, Utc};
 
 use crate::habit::{Day, Habit, HabitType};
 use crate::storage::{self, NotificationSettings};
@@ -56,8 +56,26 @@ pub enum ScreenMode {
     Editing,
     Deleting,
     Reset,
+    Holiday,
 }
 
+pub struct HolidayInput {
+    pub start: String,
+    pub end: String,
+    pub focus_end: bool,
+    pub error: Option<String>,
+}
+
+impl Default for HolidayInput {
+    fn default() -> Self {
+        HolidayInput {
+            start: String::new(),
+            end: String::new(),
+            focus_end: false,
+            error: None,
+        }
+    }
+}
 
 pub struct Counter {
     pub build_counter: usize,
@@ -87,6 +105,7 @@ pub struct App {
     pub current_habit: Habit,
     pub current_day: Day,
     pub notif: Arc<Mutex<NotificationData>>,
+    pub holiday_input: HolidayInput,
 }
 
 impl App {
@@ -101,6 +120,7 @@ impl App {
             current_day: Day::Today,
             current_habit: Habit::default(),
             notif: Arc::new(Mutex::new(NotificationData::default())),
+            holiday_input: HolidayInput::default(),
         }
     }
 
@@ -157,6 +177,52 @@ impl App {
         }
     }
 
+    pub fn toggle_holiday_mode(&mut self, habit: Habit) {
+        if let ScreenMode::Normal = self.screen_mode {
+            self.screen_mode = ScreenMode::Holiday;
+            self.current_habit = habit;
+            self.holiday_input = HolidayInput::default();
+        }
+    }
+
+    pub fn toggle_holiday_focus(&mut self) {
+        self.holiday_input.focus_end = !self.holiday_input.focus_end;
+    }
+
+    pub fn push_holiday_char(&mut self, value: char) {
+        if self.holiday_input.focus_end {
+            self.holiday_input.end.push(value);
+        } else {
+            self.holiday_input.start.push(value);
+        }
+    }
+
+    pub fn pop_holiday_char(&mut self) {
+        if self.holiday_input.focus_end {
+            self.holiday_input.end.pop();
+        } else {
+            self.holiday_input.start.pop();
+        }
+    }
+
+    pub fn add_holiday(&mut self) {
+        let parse = |s: &str| NaiveDate::parse_from_str(s.trim(), "%Y-%m-%d");
+        match (parse(&self.holiday_input.start), parse(&self.holiday_input.end)) {
+            (Ok(start), Ok(end)) => {
+                let habit = if !self.counter.switch {
+                    &mut self.build_habits[self.counter.build_counter]
+                } else {
+                    &mut self.avoid_habits[self.counter.avoid_counter]
+                };
+                habit.add_holiday(start, end);
+                self.toggle_normal_mode();
+            }
+            _ => {
+                self.holiday_input.error = Some("Use YYYY-MM-DD for both dates".to_string());
+            }
+        }
+    }
+
     pub fn toggle_delete_mode(&mut self) {
         if let ScreenMode::Normal = self.screen_mode {
             self.screen_mode = ScreenMode::Deleting;
@@ -173,6 +239,7 @@ impl App {
         if !matches!(self.screen_mode, ScreenMode::Normal) {
             self.screen_mode = ScreenMode::Normal;
             self.current_habit = Habit::default();
+            self.holiday_input = HolidayInput::default();
         }
     }
 
@@ -361,7 +428,7 @@ impl App {
             total
         )
     }
-    
+
     pub fn check_weeks_progress(&self) -> String {
         let total_habits = self.build_habits.len() + self.avoid_habits.len();
         if total_habits == 0 {

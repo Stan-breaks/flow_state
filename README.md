@@ -15,6 +15,7 @@ Most habit trackers punish a single missed day with a broken streak. That's a ba
 - **Pattern-based tracking** — weekly patterns instead of breakable streaks
 - **Dual habit types** — habits to build, habits to avoid
 - **Gentle notifications** — one reminder if you've gone quiet, one cheer if you're crushing it, silence otherwise
+- **Holidays** — mark a date range per habit so missed days don't count against your pattern
 - **Local-only storage** — plain TOML files, no accounts, no cloud
 - **Keyboard-driven** — minimal, vim-motion navigation
 
@@ -55,6 +56,7 @@ flow_state
 | `TAB` | Switch view (Today / Stats / Heatmap) |
 | `ENTER` | Toggle habit |
 | `y` | Edit yesterday instead of today |
+| `H` | Mark a holiday range for the selected habit |
 | `hjkl` | Navigate |
 | `q` | Quit |
 
