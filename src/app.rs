@@ -36,7 +36,6 @@ impl From<toml::de::Error> for AppError {
 
 impl Display for AppError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "IO error,{}", self)?;
         match self {
             AppError::Io(err) => write!(f, "IO error,{}", err),
             AppError::TomlSer(err) => write!(f, "Toml serialization error,{}", err),

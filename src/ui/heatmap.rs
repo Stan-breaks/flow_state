@@ -15,6 +15,29 @@ const WEEK_COLS: usize = 53;
 const DAYS_PER_WEEK: usize = 7;
 const MONTH_GAPS: usize = 11;
 const TOTAL_DRAW_COLS: usize = WEEK_COLS + MONTH_GAPS;
+// Fixed cell footprint so the grid reads the same at any terminal size instead
+// of stretching to fill whatever space is available.
+const MAX_CELL_W: u16 = 2;
+const ROW_H: u16 = 1;
+
+fn cell_w_for(width: u16) -> u16 {
+    (width / TOTAL_DRAW_COLS as u16).clamp(1, MAX_CELL_W)
+}
+
+/// Shrinks `available` down to the grid's fixed content size and centers it.
+fn fit_and_center(available: Rect, cell_w: u16) -> Rect {
+    let width = ((TOTAL_DRAW_COLS as u16) * cell_w).min(available.width);
+    let height = ((DAYS_PER_WEEK as u16) * ROW_H).min(available.height);
+    let x = available.x + (available.width.saturating_sub(width)) / 2;
+    let y = available.y + (available.height.saturating_sub(height)) / 2;
+    Rect::new(x, y, width, height)
+}
+
+fn center_vertical(available: Rect, height: u16) -> Rect {
+    let height = height.min(available.height);
+    let y = available.y + (available.height.saturating_sub(height)) / 2;
+    Rect::new(available.x, y, available.width, height)
+}
 
 pub fn render_heatmap_page(chunks: Rc<[Rect]>, frame: &mut Frame, app: &App) {
     let body_chunks = Layout::default()
@@ -98,7 +121,7 @@ fn render_year_list(years: &[String], selected_index: usize) -> List<'_> {
     )
 }
 
-fn render_month_label(chunk: Rect, frame: &mut Frame, month_start_cols: [usize; 12]) {
+fn render_month_label(chunk: Rect, frame: &mut Frame, month_start_cols: [usize; 12], cell_w: u16) {
     let months = [
         "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
     ];
@@ -106,21 +129,24 @@ fn render_month_label(chunk: Rect, frame: &mut Frame, month_start_cols: [usize; 
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded);
     let inner = block.inner(chunk);
-    let cell_w = inner.width / TOTAL_DRAW_COLS as u16;
+    let area = fit_and_center(inner, cell_w);
 
     for (i, &label) in months.iter().enumerate() {
         let x_offset = month_start_cols[i] as u16 * cell_w;
+        if x_offset >= area.width {
+            continue;
+        }
         let next_offset = if i + 1 < 12 {
             month_start_cols[i + 1] as u16 * cell_w
         } else {
-            inner.width
+            area.width
         };
-        let w = next_offset.saturating_sub(x_offset);
+        let w = next_offset.saturating_sub(x_offset).min(area.width - x_offset);
         if w == 0 {
             continue;
         }
-        let area = Rect::new(inner.x + x_offset, inner.y, w, inner.height);
-        frame.render_widget(Paragraph::new(label).centered(), area);
+        let label_area = Rect::new(area.x + x_offset, area.y, w, area.height);
+        frame.render_widget(Paragraph::new(label).centered(), label_area);
     }
     frame.render_widget(block, chunk);
 }
@@ -129,43 +155,31 @@ fn render_day_label(chunk: Rect, frame: &mut Frame) {
     let block = Block::default()
         .borders(Borders::ALL)
         .border_type(BorderType::Rounded)
-        .padding(Padding::vertical(1));
-    let block_inner = block.inner(chunk);
-    let days = vec!["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    let days_len = days.len();
-    let constraints = vec![Constraint::Ratio(1, days_len as u32); days_len];
+        .padding(Padding::new(0, 0, 1, 0));
+    let inner = block.inner(chunk);
+    let area = center_vertical(inner, DAYS_PER_WEEK as u16 * ROW_H);
+    let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     let day_chunks = Layout::default()
         .direction(Direction::Vertical)
-        .constraints(constraints)
-        .split(block_inner);
+        .constraints(vec![Constraint::Length(ROW_H); DAYS_PER_WEEK])
+        .split(area);
 
     for (i, &day) in days.iter().enumerate() {
-        let area = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([
-                Constraint::Fill(1),
-                Constraint::Length(1),
-                Constraint::Fill(1),
-            ])
-            .split(day_chunks[i]);
-
-        frame.render_widget(Paragraph::new(day).centered(), area[1]);
+        frame.render_widget(Paragraph::new(day).centered(), day_chunks[i]);
     }
     frame.render_widget(block, chunk);
 }
 
-fn cell_rect(chunk: Rect, row: usize, col: usize) -> Rect {
-    let cell_w = chunk.width / TOTAL_DRAW_COLS as u16;
-    let cell_h = chunk.height / DAYS_PER_WEEK as u16;
+fn cell_rect(chunk: Rect, row: usize, col: usize, cell_w: u16) -> Rect {
     Rect::new(
         chunk.x + col as u16 * cell_w,
-        chunk.y + row as u16 * cell_h,
+        chunk.y + row as u16 * ROW_H,
         cell_w,
-        cell_h,
+        ROW_H,
     )
 }
 
-fn render_grid(chunk: Rect, frame: &mut Frame, app: &App) {
+fn render_grid(chunk: Rect, frame: &mut Frame, app: &App, cell_w: u16) {
     let selected_year: i32 = app
         .years
         .get(app.counter.year_counter)
@@ -198,22 +212,11 @@ fn render_grid(chunk: Rect, frame: &mut Frame, app: &App) {
             }
 
             let color = rate_to_color(app.completion_rate_for_date(date));
-            let area = cell_rect(chunk, row, draw_col);
-            let grid = Layout::default()
-                .direction(Direction::Vertical)
-                .constraints([
-                    Constraint::Fill(1),
-                    Constraint::Length(1),
-                    Constraint::Fill(1),
-                ])
-                .split(area);
-            frame.render_widget(
-                Block::default()
-                    .bg(color)
-                    .border_type(BorderType::Rounded)
-                    .borders(Borders::ALL),
-                grid[1],
-            );
+            let area = cell_rect(chunk, row, draw_col, cell_w);
+            // Leave a 1-col gap between cells (when there's room) so weeks stay legible.
+            let fill_w = if cell_w > 1 { cell_w - 1 } else { 1 };
+            let fill_area = Rect::new(area.x, area.y, fill_w, area.height);
+            frame.render_widget(Block::default().bg(color), fill_area);
             day_of_year += 1;
         }
         draw_col += 1;
@@ -222,7 +225,8 @@ fn render_grid(chunk: Rect, frame: &mut Frame, app: &App) {
 
 fn rate_to_color(rate: f32) -> Color {
     if rate <= 0.0 {
-        Color::default()
+        // Visible empty tile — a fully invisible cell reads as a missing grid.
+        Color::Rgb(30, 34, 38)
     } else if rate < 0.25 {
         Color::Rgb(14, 68, 41)
     } else if rate < 0.50 {
@@ -251,8 +255,6 @@ fn render_heatmap_body(chunk: Rect, frame: &mut Frame, app: &App) {
         .constraints([Constraint::Length(5), Constraint::Min(1)])
         .split(body_chunks[0]);
 
-    render_month_label(label_chunks[1], frame, month_start_cols);
-
     let day_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Length(5), Constraint::Min(1)])
@@ -264,6 +266,10 @@ fn render_heatmap_body(chunk: Rect, frame: &mut Frame, app: &App) {
         .border_type(BorderType::Rounded)
         .padding(Padding::new(1, 1, 1, 0));
     let block_inner = block.inner(day_chunks[1]);
-    render_grid(block_inner, frame, app);
+    let cell_w = cell_w_for(block_inner.width);
+    let grid_area = fit_and_center(block_inner, cell_w);
+
+    render_month_label(label_chunks[1], frame, month_start_cols, cell_w);
+    render_grid(grid_area, frame, app, cell_w);
     frame.render_widget(block, day_chunks[1]);
 }
