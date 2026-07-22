@@ -18,7 +18,9 @@ const TOTAL_DRAW_COLS: usize = WEEK_COLS + MONTH_GAPS;
 // Fixed cell footprint so the grid reads the same at any terminal size instead
 // of stretching to fill whatever space is available.
 const MAX_CELL_W: u16 = 2;
-const ROW_H: u16 = 1;
+// 1 line of color + 1 line of gap, so weekdays read as distinct cells
+// instead of fusing into a solid vertical bar.
+const ROW_H: u16 = 2;
 
 fn cell_w_for(width: u16) -> u16 {
     (width / TOTAL_DRAW_COLS as u16).clamp(1, MAX_CELL_W)
@@ -141,7 +143,9 @@ fn render_month_label(chunk: Rect, frame: &mut Frame, month_start_cols: [usize; 
         } else {
             area.width
         };
-        let w = next_offset.saturating_sub(x_offset).min(area.width - x_offset);
+        let w = next_offset
+            .saturating_sub(x_offset)
+            .min(area.width - x_offset);
         if w == 0 {
             continue;
         }
@@ -213,9 +217,11 @@ fn render_grid(chunk: Rect, frame: &mut Frame, app: &App, cell_w: u16) {
 
             let color = rate_to_color(app.completion_rate_for_date(date));
             let area = cell_rect(chunk, row, draw_col, cell_w);
-            // Leave a 1-col gap between cells (when there's room) so weeks stay legible.
+            // Leave a 1-col/1-row gap around each cell so both weeks and
+            // weekdays stay visually distinct instead of fusing into bars.
             let fill_w = if cell_w > 1 { cell_w - 1 } else { 1 };
-            let fill_area = Rect::new(area.x, area.y, fill_w, area.height);
+            let fill_h = if area.height > 1 { area.height - 1 } else { 1 };
+            let fill_area = Rect::new(area.x, area.y, fill_w, fill_h);
             frame.render_widget(Block::default().bg(color), fill_area);
             day_of_year += 1;
         }
@@ -223,10 +229,11 @@ fn render_grid(chunk: Rect, frame: &mut Frame, app: &App, cell_w: u16) {
     }
 }
 
+// Same 5-step Gray/Yellow/Cyan/LightGreen/Green language as the Stats page's
+// pattern tiers, so the same color means the same thing on both screens.
 fn rate_to_color(rate: f32) -> Color {
     if rate <= 0.0 {
-        // Visible empty tile — a fully invisible cell reads as a missing grid.
-        Color::Rgb(30, 34, 38)
+        Color::DarkGray
     } else if rate < 0.25 {
         Color::Rgb(14, 68, 41)
     } else if rate < 0.50 {
