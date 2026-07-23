@@ -2,9 +2,9 @@
 
 A terminal habit tracker for neurodivergent brains. Tracks patterns, not streaks — missing a day doesn't reset your progress.
 
-| | |
-|---|---|
-| ![home screen image](assets/image2.png) | ![heatmap image](assets/image1.png) |
+| | | |
+|---|---|---|
+| ![home screen image](assets/image1.png) | ![stats image](assets/image2.png) | ![heatmap image](assets/image3.png) |
 
 ## Why
 
