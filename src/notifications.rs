@@ -58,11 +58,13 @@ pub fn check_notification_trigger(count: NotificationData, iter: &mut Peekable<S
 pub fn send_notification(count: NotificationData) {
     let s = count.get_notification_text();
     if !s.is_empty() {
-        let _ = Notification::new().summary("flow_state reminder")
-            .body(&s[..])
-            .timeout(0)
-            .urgency(notify_rust::Urgency::Normal)
-            .show();
+        let mut notification = Notification::new();
+        notification.summary("flow_state reminder").body(&s[..]).timeout(0);
+        // urgency() is a Linux/D-Bus-only builder method — macOS's
+        // notification backend doesn't expose it.
+        #[cfg(not(target_os = "macos"))]
+        notification.urgency(notify_rust::Urgency::Normal);
+        let _ = notification.show();
     }
 }
 
