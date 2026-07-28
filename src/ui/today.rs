@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::app::App;
 use crate::habit::{Day, Habit};
-use ratatui::widgets::BorderType;
+use ratatui::widgets::{BorderType, Paragraph};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Stylize},
@@ -114,5 +114,20 @@ fn render_footer(area: Rect, frame: &mut Frame, app: &App) {
                 .border_type(BorderType::Rounded),
         ),
         inner_chunks[1],
+    );
+    let inner_inner_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage(25),
+            Constraint::Percentage(50),
+            Constraint::Percentage(25),
+        ])
+        .split(inner_chunks[2]);
+
+    frame.render_widget(
+        Paragraph::new(Line::from("? • toggle help").fg(Color::Gray))
+            .centered()
+            .block(Block::default()),
+        inner_inner_chunks[1],
     );
 }
