@@ -303,29 +303,33 @@ impl App {
     }
 
     pub fn add_habit(&mut self) {
-        self.current_habit.created = today_with_cutoff(self.day_cutoff_hour);
-        match self.current_habit.habit_type {
-            HabitType::Build => self.build_habits.push(self.current_habit.clone()),
-            HabitType::Avoid => self.avoid_habits.push(self.current_habit.clone()),
+        if !self.current_habit.name.trim().is_empty() {
+            self.current_habit.created = today_with_cutoff(self.day_cutoff_hour);
+            match self.current_habit.habit_type {
+                HabitType::Build => self.build_habits.push(self.current_habit.clone()),
+                HabitType::Avoid => self.avoid_habits.push(self.current_habit.clone()),
+            }
         }
         self.toggle_normal_mode();
     }
 
     pub fn edit_habit(&mut self) {
-        match (self.counter.switch, &self.current_habit.habit_type) {
-            (false, HabitType::Build) => {
-                self.build_habits[self.counter.build_counter] = self.current_habit.clone();
-            }
-            (false, HabitType::Avoid) => {
-                self.build_habits.remove(self.counter.build_counter);
-                self.avoid_habits.push(self.current_habit.clone());
-            }
-            (true, HabitType::Build) => {
-                self.avoid_habits.remove(self.counter.avoid_counter);
-                self.build_habits.push(self.current_habit.clone());
-            }
-            (true, HabitType::Avoid) => {
-                self.avoid_habits[self.counter.avoid_counter] = self.current_habit.clone();
+        if !self.current_habit.name.trim().is_empty() {
+            match (self.counter.switch, &self.current_habit.habit_type) {
+                (false, HabitType::Build) => {
+                    self.build_habits[self.counter.build_counter] = self.current_habit.clone();
+                }
+                (false, HabitType::Avoid) => {
+                    self.build_habits.remove(self.counter.build_counter);
+                    self.avoid_habits.push(self.current_habit.clone());
+                }
+                (true, HabitType::Build) => {
+                    self.avoid_habits.remove(self.counter.avoid_counter);
+                    self.build_habits.push(self.current_habit.clone());
+                }
+                (true, HabitType::Avoid) => {
+                    self.avoid_habits[self.counter.avoid_counter] = self.current_habit.clone();
+                }
             }
         }
         self.toggle_normal_mode();
